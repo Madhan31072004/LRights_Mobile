@@ -15,10 +15,8 @@ services:
         sync: false
     rootDir: learn-rights-python
 
-  # LearnRights Frontend (React)
-  - type: web
-    name: learn-rights-frontend
-    runtime: static
+staticSites:
+  - name: learn-rights-frontend
     buildCommand: npm install && npm run build
     publishDir: build
     rootDir: learn-rights-frontend

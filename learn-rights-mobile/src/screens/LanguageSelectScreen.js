@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView, Dimensions, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { Globe, Check } from 'lucide-react-native';
@@ -15,11 +15,13 @@ const LanguageSelectScreen = ({ navigation }) => {
     setSelectedLang(langCode);
     setLoading(true);
     
-    const success = await loadTranslations(langCode);
-    setLoading(false);
-    
-    if (success) {
-      navigation.replace('Welcome');
+    try {
+      const success = await loadTranslations(langCode);
+      if (success) {
+        navigation.replace('Welcome');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,7 +57,7 @@ const LanguageSelectScreen = ({ navigation }) => {
               entering={ZoomIn.delay(300 + index * 50)}
               style={styles.cardWrapper}
             >
-              <TouchableOpacity 
+              <Pressable 
                 style={[
                   styles.card, 
                   selectedLang === lang.code && styles.activeCard
@@ -74,7 +76,7 @@ const LanguageSelectScreen = ({ navigation }) => {
                     </View>
                   )}
                 </LinearGradient>
-              </TouchableOpacity>
+              </Pressable>
             </Animated.View>
           ))}
         </View>

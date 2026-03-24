@@ -89,6 +89,26 @@ const MainTabs = () => {
   );
 };
 
+// Global Scroll Fix for Web
+if (Platform.OS === 'web') {
+  const style = document.createElement('style');
+  style.textContent = `
+    html, body, #root, [data-contents="true"] {
+      overflow: auto !important;
+      height: 100% !important;
+      overscroll-behavior: contain;
+    }
+    /* Force focused elements to not block scroll via aria-hidden */
+    [aria-hidden="true"] {
+      pointer-events: none !important;
+    }
+    [aria-hidden="false"] {
+      pointer-events: auto !important;
+    }
+  `;
+  document.head.append(style);
+}
+
 const Navigation = () => {
   const { token, loading } = useUser();
 
