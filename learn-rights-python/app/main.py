@@ -78,6 +78,21 @@ if UPLOAD_DIR.exists():
     app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url}")
+    response = await call_next(request)
+    return response
+
+@app.options("/{rest:path}")
+async def preflight_handler():
+    # Explicitly return empty dict for OPTIONS to satisfy preflight
+    return {}
+
 @app.get("/")
 def root():
-    return {"message": "LearnRights API (Python)", "docs": "/docs"}
+    return {
+        "message": "LearnRights API (Python) is active",
+        "docs": "/docs",
+        "timestamp": True
+    }
