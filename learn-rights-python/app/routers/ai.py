@@ -378,7 +378,7 @@ Return ONLY the raw JSON list.'''
     except Exception as e:
         import traceback
         err_msg = traceback.format_exc()
-        with open("c:/Users/madha/Desktop/LearnRights-main/ai_errors.txt", "a") as f:
+        with open("ai_errors.txt", "a") as f:
             f.write(f"\n--- {datetime.now()} ---\n{err_msg}\n")
         print(f"AI Match Generation Error: {e}")
         return game_fallbacks.get_match_fallback(body.moduleId)
