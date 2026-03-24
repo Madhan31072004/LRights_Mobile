@@ -65,34 +65,46 @@ if UPLOAD_DIR.exists():
     app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 @app.middleware("http")
-async def combined_custom_middleware(request: Request, call_next):
-    # 1. Log the incoming request
-    logger.info(f"Req: {request.method} {request.url} | Origin: {request.headers.get('origin')}")
-    
-    # 2. Handle OPTIONS preflight manually for maximum CORS reliability
+async def manual_cors_middleware(request: Request, call_next):
+    # 1. Handle OPTIONS preflight manually for maximum CORS reliability
     if request.method == "OPTIONS":
-        response = Response()
-        response.status_code = 204
-    else:
-        try:
-            response = await call_next(request)
-        except Exception as e:
-            logger.error(f"Middleware caught unhandled exception: {e}")
-            traceback.print_exc()
-            response = Response(content=json.dumps({"detail": "Internal Server Error"}), status_code=500, media_type="application/json")
-
-    # 3. Inject CORS headers into EVERY response
-    origin = request.headers.get("origin")
-    # Allow all onrender.com subdomains, localhost, and 127.0.0.1
-    if origin and (".onrender.com" in origin or "localhost" in origin or "127.0.0.1" in origin):
-        response.headers["Access-Control-Allow-Origin"] = origin
-        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response = Response(status_code=204)
+        origin = request.headers.get("origin")
+        if origin:
+            response.headers["Access-Control-Allow-Origin"] = origin
+        else:
+            response.headers["Access-Control-Allow-Origin"] = "*"
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Bypass-Tunnel-Reminder, X-Requested-With"
-    elif not origin:
-        # Fallback for direct API calls/mobile app (which might not send Origin)
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
+
+    # 2. Process the request
+    try:
+        response = await call_next(request)
+    except Exception as e:
+        logger.error(f"Middleware caught unhandled exception: {e}")
+        traceback.print_exc()
+        from fastapi.responses import JSONResponse
+        response = JSONResponse(content={"detail": "Internal Server Error", "msg": str(e)}, status_code=500)
+
+    # 3. Inject CORS headers into EVERY response (including errors)
+    origin = request.headers.get("origin")
+    if origin:
+        # Aggressive allow: if it's from Render or localhost
+        if ".onrender.com" in origin or "localhost" in origin or "127.0.0.1" in origin:
+            response.headers["Access-Control-Allow-Origin"] = origin
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+        else:
+            # Fallback for other origins
+            response.headers["Access-Control-Allow-Origin"] = origin
+    else:
+        # Direct calls
         response.headers["Access-Control-Allow-Origin"] = "*"
         
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Bypass-Tunnel-Reminder, X-Requested-With"
+    
     return response
 
 @app.get("/")

@@ -27,9 +27,8 @@ def get_db() -> Database:
     try:
         logger.info("Attempting to connect to MongoDB: %s", _mask_uri(MONGODB_URI))
         _client = MongoClient(MONGODB_URI, serverSelectionTimeoutMS=5000)
-        _client.admin.command("ping")
         _db = _client[DB_NAME]
-        logger.info("MongoDB Connected (Atlas)")
+        logger.info("MongoDB Connection Initialized (Atlas)")
         return _db
     except Exception as atlas_err:
         logger.warning("MongoDB Atlas failed, trying local: %s", atlas_err)
