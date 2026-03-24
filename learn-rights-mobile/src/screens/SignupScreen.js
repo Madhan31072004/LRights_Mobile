@@ -19,21 +19,27 @@ const SignupScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Google Auth Hook - Using the Client ID exactly as verified in backend .env
-  const googleClientId = "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com";
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: googleClientId,
-    iosClientId: googleClientId,
-    webClientId: googleClientId,
+  // Google Auth Hook - Using separate IDs for Android/iOS/Web
+  const googleConfig = {
+    androidClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com", // Replace with Android Client ID
+    iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",     // Replace with iOS Client ID
+    webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
-  });
-
+  };
+  
+  const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      handleGoogleSignup(authentication.accessToken);
+    if (response) {
+      if (response.type === 'success') {
+        const { authentication } = response;
+        handleGoogleSignup(authentication.accessToken);
+      } else if (response.type === 'error' || response.type === 'cancel') {
+        console.warn('Google Signup Response:', response);
+        if (response.type === 'error') {
+          setError(`Google Signup ${response.error?.message || 'failed'}`);
+        }
+      }
     }
   }, [response]);
 
@@ -163,7 +169,7 @@ const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
-  scrollContent: { paddingHorizontal: 30, paddingTop: 60, paddingBottom: 40 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 30, paddingTop: 60, paddingBottom: 40 },
   header: { alignItems: 'center', marginBottom: 40 },
   logoBox: { width: 80, height: 80, borderRadius: 25, backgroundColor: 'rgba(124,58,237,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   title: { color: 'white', fontSize: 28, fontWeight: '800' },

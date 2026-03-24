@@ -21,21 +21,27 @@ const LoginScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [showPwd, setShowPwd] = useState(false);
 
-  // Google Auth Hook - Using the Client ID exactly as verified in backend .env
-  const googleClientId = "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com";
-  
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: googleClientId,
-    iosClientId: googleClientId,
-    webClientId: googleClientId,
+  // Google Auth Hook - Using separate IDs for Android/iOS/Web
+  const googleConfig = {
+    androidClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com", // Replace with Android Client ID
+    iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",     // Replace with iOS Client ID
+    webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
-  });
-
+  };
+  
+  const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
 
   useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      handleGoogleLogin(authentication.accessToken);
+    if (response) {
+      if (response.type === 'success') {
+        const { authentication } = response;
+        handleGoogleLogin(authentication.accessToken);
+      } else if (response.type === 'error' || response.type === 'cancel') {
+        console.warn('Google Login Response:', response);
+        if (response.type === 'error') {
+          setError(`Google Login ${response.error?.message || 'failed'}`);
+        }
+      }
     }
   }, [response]);
 
