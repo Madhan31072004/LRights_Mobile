@@ -44,7 +44,13 @@ app = FastAPI(title="LearnRights API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://lrights-mobile.onrender.com",
+        "https://learn-rights-mobile.onrender.com",
+        "https://learn-rights.onrender.com",
+        "http://localhost:3000",
+        "http://localhost:19006",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

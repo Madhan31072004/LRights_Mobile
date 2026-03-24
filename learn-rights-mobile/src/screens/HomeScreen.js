@@ -321,9 +321,9 @@ const HomeScreen = () => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizScroll}>
                 {(modules || []).slice(-4).reverse().map((m, i) => {
                     const color = MOD_COLORS[m.code] || "#7c3aed";
-                    const isCompleted = progress?.completedModules?.some(id => id.toString() === m._id.toString());
+                    const isCompleted = (progress?.completedModules || []).some(id => id.toString() === m._id.toString());
                     const totalSub = m.topics?.reduce((acc, top) => acc + (top.subTopics?.length || 0), 0) || 0;
-                    const doneSub = progress?.completedSubTopics?.filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
+                    const doneSub = (progress?.completedSubTopics || []).filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
                     const pct = totalSub > 0 ? Math.round((doneSub / totalSub) * 100) : 0;
                     
                     return (
@@ -419,9 +419,9 @@ const HomeScreen = () => {
             <View style={styles.progressContainer}>
                 {(modules || [])
                     .map(m => {
-                        const isCompleted = progress?.completedModules?.some(id => id.toString() === m._id.toString());
+                        const isCompleted = (progress?.completedModules || []).some(id => id.toString() === m._id.toString());
                         const totalSub = m.topics?.reduce((acc, top) => acc + (top.subTopics?.length || 0), 0) || 0;
-                        const doneSub = progress?.completedSubTopics?.filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
+                        const doneSub = (progress?.completedSubTopics || []).filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
                         const pct = totalSub > 0 ? Math.round((doneSub / totalSub) * 100) : 0;
                         return { ...m, pct, isCompleted, totalSub, doneSub };
                     })
@@ -442,8 +442,8 @@ const HomeScreen = () => {
                     ))}
                 {(!modules || modules.filter(m => {
                     const totalSub = m.topics?.reduce((acc, top) => acc + (top.subTopics?.length || 0), 0) || 0;
-                    const doneSub = progress?.completedSubTopics?.filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
-                    const isCompleted = progress?.completedModules?.some(id => id.toString() === m._id.toString());
+                    const doneSub = (progress?.completedSubTopics || []).filter(id => m.topics?.some(topic => topic.subTopics?.some(sub => (sub._id || sub.title) === id))).length || 0;
+                    const isCompleted = (progress?.completedModules || []).some(id => id.toString() === m._id.toString());
                     return (totalSub > 0 && Math.round((doneSub / totalSub) * 100) > 0 && !isCompleted);
                 }).length === 0) && (
                     <View style={styles.emptyRecent}>
