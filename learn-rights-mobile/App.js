@@ -98,15 +98,30 @@ if (Platform.OS === 'web') {
       height: 100% !important;
       overscroll-behavior: contain;
     }
-    /* Force focused elements to not block scroll via aria-hidden */
+    /* Implementation of the 'Inert' suggestion for web accessibility */
     [aria-hidden="true"] {
       pointer-events: none !important;
+      user-select: none !important;
+      touch-action: none !important;
     }
-    [aria-hidden="false"] {
+    [aria-hidden="true"] * {
+      pointer-events: none !important;
+    }
+    /* Ensure the active screen is always interactive */
+    [aria-hidden="false"], :not([aria-hidden]) {
       pointer-events: auto !important;
     }
   `;
   document.head.append(style);
+
+  // Focus trap resolution: Blur elements that are inside aria-hidden containers
+  document.addEventListener('focusin', (e) => {
+    const target = e.target;
+    if (target.closest('[aria-hidden="true"]')) {
+      console.warn('[FocusFix] Prevented focus on aria-hidden element:', target);
+      target.blur();
+    }
+  }, true);
 }
 
 const Navigation = () => {
