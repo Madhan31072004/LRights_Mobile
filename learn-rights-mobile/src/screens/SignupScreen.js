@@ -15,9 +15,22 @@ WebBrowser.maybeCompleteAuthSession();
 
 const SignupScreen = ({ navigation }) => {
   const { login, language } = useUser();
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', preferredLanguage: 'en' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    email: '', 
+    password: '', 
+    confirmPassword: '', 
+    preferredLanguage: language || 'en' 
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Sync language if it changes in context
+  useEffect(() => {
+    if (language && form.preferredLanguage === 'en' && language !== 'en') {
+      setForm(prev => ({ ...prev, preferredLanguage: language }));
+    }
+  }, [language]);
 
   // Google Auth Hook - Using separate IDs for Android/iOS/Web
   const googleConfig = {
@@ -30,9 +43,11 @@ const SignupScreen = ({ navigation }) => {
   const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
 
   useEffect(() => {
+    console.log("Google Auth Response Type:", response?.type);
     if (response) {
       if (response.type === 'success') {
         const { authentication } = response;
+        console.log("Google Auth Success, token obtained.");
         handleGoogleSignup(authentication.accessToken);
       } else if (response.type === 'error' || response.type === 'cancel') {
         console.warn('Google Signup Response:', response);
