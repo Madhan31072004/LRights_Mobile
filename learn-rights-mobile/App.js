@@ -139,7 +139,7 @@ const Navigation = () => {
   return (
     <Stack.Navigator 
       screenOptions={{ headerShown: false }}
-      initialRouteName={!initialLang ? "LanguageSelect" : "Welcome"}
+      initialRouteName={token ? "Main" : (!initialLang ? "LanguageSelect" : "Welcome")}
     >
       {!token ? (
         <>

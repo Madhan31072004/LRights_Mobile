@@ -19,7 +19,7 @@ const baseURL = process.env.NODE_ENV === 'production'
 
 const instance = axios.create({
   baseURL,
-  timeout: 15000,
+  timeout: 30000,
   headers: {
       "Bypass-Tunnel-Reminder": "true"
   }
