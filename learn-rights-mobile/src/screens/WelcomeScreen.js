@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Animated as RNAnimated, Platform } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Animated as RNAnimated, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInDown, ZoomIn, useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming, interpolate, Extrapolate, runOnJS } from 'react-native-reanimated';
 import { ShieldCheck, ArrowRight, Bot, Scale, ShieldAlert, Sparkles, Globe } from 'lucide-react-native';

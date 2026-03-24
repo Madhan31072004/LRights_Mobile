@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ChevronLeft, Trash2, AlertTriangle, MessageSquare, User, Clock } from 'lucide-react-native';
+import { ChevronLeft, Trash2, AlertTriangle, MessageSquare, User, Clock, ShieldCheck } from 'lucide-react-native';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
 import { t } from '../utils/translation';
