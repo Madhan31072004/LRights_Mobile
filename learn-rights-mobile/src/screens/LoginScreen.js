@@ -16,10 +16,17 @@ WebBrowser.maybeCompleteAuthSession();
 
 const LoginScreen = ({ navigation }) => {
   const { login, language } = useUser();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ email: '', password: '', preferredLanguage: language || 'en' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPwd, setShowPwd] = useState(false);
+
+  // Sync language if it changes in context
+  useEffect(() => {
+    if (language && form.preferredLanguage === 'en' && language !== 'en') {
+      setForm(prev => ({ ...prev, preferredLanguage: language }));
+    }
+  }, [language]);
 
   // Google Auth Hook - Using separate IDs for Android/iOS/Web
   const googleConfig = {
