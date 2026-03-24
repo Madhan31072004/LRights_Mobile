@@ -15,10 +15,12 @@ services:
         sync: false
     rootDir: learn-rights-python
 
-staticSites:
-  - name: learn-rights-frontend
+  # LearnRights Frontend (React - Web Served to satisfy linter)
+  - type: web
+    name: learn-rights-frontend
+    runtime: node
     buildCommand: npm install && npm run build
-    publishDir: build
+    startCommand: npx serve -s build
     rootDir: learn-rights-frontend
     envVars:
       - key: REACT_APP_API_URL
