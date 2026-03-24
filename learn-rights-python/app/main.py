@@ -51,6 +51,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:19006",
     ],
+    allow_origin_regex="https://.*\\.onrender\\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

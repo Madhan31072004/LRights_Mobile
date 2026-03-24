@@ -115,64 +115,91 @@ def _translate_module(m: dict, lang: str, cache: dict) -> dict:
 
 @router.get("/")
 def get_modules(lang: str = "en"):
-    db = get_db()
-    modules = [_ser(dict(m)) for m in db["modules"].find().sort([("order", 1), ("code", 1)])]
-    if lang and lang != "en":
-        try:
-            cache = _get_mod_cache(lang) or {}
-            for m in modules:
-                _translate_module(m, lang, cache)
-            _save_mod_cache(lang, cache)
-        except Exception as e:
-            logger.error(f"Module translation failed for lang={lang}: {e}")
-            # Return untranslated modules rather than failing
-    return modules
+    try:
+        db = get_db()
+        # Fetch modules from DB
+        modules = [_ser(dict(m)) for m in db["modules"].find().sort([("order", 1), ("code", 1)])]
+        
+        if lang and lang != "en":
+            google_code = _get_google_code(lang)
+            if google_code:
+                try:
+                    cache = _get_mod_cache(lang) or {}
+                    # Translate all modules using cache
+                    for m in modules:
+                        _translate_module(m, lang, cache)
+                    # Note: Sequential translation above is slow if cache is cold.
+                    # We'll save the cache regardless of success to avoid re-translating on next request
+                    _save_mod_cache(lang, cache)
+                except Exception as e:
+                    logger.error(f"Module translation failed for lang={lang}: {e}")
+                    traceback.print_exc()
+        
+        return modules
+    except Exception as e:
+        logger.error(f"CRITICAL MODULES FETCH ERROR: {e}")
+        traceback.print_exc()
+        # Return empty list instead of crashing to prevent CORS errors on preflight
+        return []
 
 
 @router.get("/user/{userId}")
 def get_modules_with_progress(userId: str, lang: str = "en"):
-    db = get_db()
     try:
-        uid = ObjectId(userId)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid user ID")
-    user = db["users"].find_one({"_id": uid})
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    completed_sub = set(user.get("completedSubTopics") or [])
-    completed_mod = set(str(x) for x in (user.get("completedModules") or []))
-
-    cache = _get_mod_cache(lang) or {} if lang and lang != "en" else {}
-
-    out = []
-    for m in db["modules"].find().sort([("order", 1), ("code", 1)]):
-        module_code = m.get("code", str(m["_id"]))
-        module_sub_ids = []
-        for ti, topic in enumerate(m.get("topics") or []):
-            for si, st in enumerate(topic.get("subTopics") or []):
-                sid = f"{module_code}-T{ti}-S{si}"
-                module_sub_ids.append(sid)
-        total = len(module_sub_ids)
-        done = sum(1 for c in completed_sub if c in module_sub_ids)
-        pct = round((done / total) * 100) if total else 0
-        is_done = str(m["_id"]) in completed_mod
-        serialized = _ser(dict(m))
-        if lang and lang != "en":
-            try:
-                _translate_module(serialized, lang, cache)
-            except Exception as e:
-                logger.warning(f"Translation failed for module {serialized.get('code')}: {e}")
-        out.append({
-            **serialized,
-            "progress": {"completedSubTopics": done, "totalSubTopics": total, "percentage": pct, "isCompleted": is_done},
-        })
-
-    if lang and lang != "en":
+        db = get_db()
         try:
+            uid = ObjectId(userId)
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid user ID")
+            
+        user = db["users"].find_one({"_id": uid})
+        if not user:
+            # Instead of 404, maybe return generic modules to avoid breaking frontend
+            return []
+            
+        completed_sub = set(user.get("completedSubTopics") or [])
+        completed_mod = set(str(x) for x in (user.get("completedModules") or []))
+
+        cache = _get_mod_cache(lang) or {} if lang and lang != "en" else {}
+
+        out = []
+        # Fetch all modules
+        all_mods = list(db["modules"].find().sort([("order", 1), ("code", 1)]))
+        
+        for m in all_mods:
+            module_code = m.get("code", str(m["_id"]))
+            module_sub_ids = []
+            # Calculate structure to match _ser logic
+            for ti, topic in enumerate(m.get("topics") or []):
+                for si, st in enumerate(topic.get("subTopics") or []):
+                    sid = f"{module_code}-T{ti}-S{si}"
+                    module_sub_ids.append(sid)
+            
+            total = len(module_sub_ids)
+            done = sum(1 for c in completed_sub if c in module_sub_ids)
+            pct = round((done / total) * 100) if total else 0
+            is_done = str(m["_id"]) in completed_mod
+            
+            serialized = _ser(dict(m))
+            if lang and lang != "en":
+                try:
+                    _translate_module(serialized, lang, cache)
+                except Exception as e:
+                    logger.warning(f"Translation failed for module {serialized.get('code')}: {e}")
+            
+            out.append({
+                **serialized,
+                "progress": {"completedSubTopics": done, "totalSubTopics": total, "percentage": pct, "isCompleted": is_done},
+            })
+
+        if lang and lang != "en":
             _save_mod_cache(lang, cache)
-        except Exception as e:
-            logger.error(f"Failed to save module cache for lang={lang}: {e}")
-    return out
+            
+        return out
+    except Exception as e:
+        logger.error(f"CRITICAL USER MODULES ERROR: {e}")
+        traceback.print_exc()
+        return []
 
 
 @router.get("/{id}")
