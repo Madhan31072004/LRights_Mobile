@@ -30,25 +30,33 @@ const LoginScreen = ({ navigation }) => {
 
   // Google Auth Hook - Using separate IDs for Android/iOS/Web
   const googleConfig = {
-    androidClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com", // Replace with Android Client ID
-    iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",     // Replace with iOS Client ID
+    androidClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
+    iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
+    // Ensure the redirect URI is correctly resolved for BOTH Expo Go and Production Web
+    redirectUri: AuthSession.makeRedirectUri({
+      scheme: 'learnrights',
+      preferLocalhost: true,
+    }),
   };
   
   const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
 
   useEffect(() => {
-    console.log("Google Login Response Type:", response?.type);
     if (response) {
+      console.log("Google Login Full Response:", JSON.stringify(response, null, 2));
+      
       if (response.type === 'success') {
         const { authentication } = response;
         console.log("Google Login Success, token obtained.");
         handleGoogleLogin(authentication.accessToken);
-      } else if (response.type === 'error' || response.type === 'cancel') {
-        console.warn('Google Login Response:', response);
+      } else if (response.type === 'error' || response.type === 'cancel' || response.type === 'dismiss') {
+        console.warn(`Google Login ${response.type}:`, response);
         if (response.type === 'error') {
-          setError(`Google Login ${response.error?.message || 'failed'}`);
+          setError(`Google Login Error: ${response.error?.message || 'Check Cloud Console Configuration'}`);
+        } else if (response.type === 'dismiss') {
+          setError('Google Login was dismissed. Please try again.');
         }
       }
     }
