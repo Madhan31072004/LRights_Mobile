@@ -31,7 +31,11 @@ const LanguageSelectScreen = ({ navigation }) => {
       <View style={[styles.bgShape, { top: -100, left: -100, backgroundColor: '#4c1d95' }]} />
       <View style={[styles.bgShape, { bottom: -100, right: -100, backgroundColor: '#1e3a8a' }]} />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
         <Animated.View entering={FadeInUp.delay(200)} style={styles.header}>
           <View style={styles.iconContainer}>
             <Globe color="#7c3aed" size={40} />
@@ -86,7 +90,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0f172a' },
   background: { ...StyleSheet.absoluteFillObject },
   bgShape: { position: 'absolute', width: 300, height: 300, borderRadius: 150, opacity: 0.15 },
-  scrollContent: { paddingHorizontal: 20, paddingTop: 80, paddingBottom: 40 },
+  scrollContent: { paddingHorizontal: 20, paddingTop: 80, paddingBottom: 100 },
   header: { alignItems: 'center', marginBottom: 40 },
   iconContainer: { width: 80, height: 80, borderRadius: 25, backgroundColor: 'rgba(124, 58, 237, 0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(124, 58, 237, 0.2)' },
   title: { color: 'white', fontSize: 28, fontWeight: '900', textAlign: 'center', marginBottom: 10 },
