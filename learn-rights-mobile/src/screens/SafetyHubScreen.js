@@ -70,7 +70,11 @@ const SafetyHubScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#1a0b2e', '#0f0c29']} style={StyleSheet.absoluteFill} />
+            <LinearGradient 
+                colors={['#1a0b2e', '#0f0c29']} 
+                style={StyleSheet.absoluteFill} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <View style={styles.statusIndicator}>

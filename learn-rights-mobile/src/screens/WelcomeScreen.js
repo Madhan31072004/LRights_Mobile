@@ -78,7 +78,10 @@ const WelcomeScreen = ({ navigation }) => {
         opacity: interpolate(float.value, [0, 1], [0.1, 0.3])
     }));
     return (
-        <Animated.View style={[styles.floatingIcon, { top, left }, style]}>
+        <Animated.View 
+            style={[styles.floatingIcon, { top, left }, style]}
+            pointerEvents="none"
+        >
             <Icon size={24} color="white" />
         </Animated.View>
     );
@@ -88,7 +91,11 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={currentSlide.bg} style={styles.background} />
+      <LinearGradient 
+        colors={currentSlide.bg} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
 
       {/* Decorative floating icons */}
       <FloatingIcon Icon={Sparkles} top="15%" left="10%" delay={0} />
@@ -96,69 +103,75 @@ const WelcomeScreen = ({ navigation }) => {
       <FloatingIcon Icon={ShieldCheck} top="60%" left="15%" delay={1000} />
       <FloatingIcon Icon={Scale} top="75%" left="75%" delay={1500} />
 
-      <View style={styles.content}>
-        <Animated.View key={activeSlide} entering={ZoomIn.duration(600)} style={styles.cardContainer}>
-            <LinearGradient colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.05)']} style={styles.glassCard}>
-                <View style={[styles.iconBox, { backgroundColor: currentSlide.color + '20', borderColor: currentSlide.color + '40' }]}>
-                    <currentSlide.icon size={50} color={currentSlide.color} />
-                    <Animated.View entering={ZoomIn.delay(300)} style={[styles.iconGlow, { backgroundColor: currentSlide.color }]} />
-                </View>
-
-                <Animated.View entering={FadeInUp.delay(200)} style={styles.textColumn}>
-                    <Text style={styles.brand}>{t('app_name').toUpperCase()}</Text>
-                    <Text style={styles.title}>{t(currentSlide.titleKey)}</Text>
-                    <Text style={styles.description}>{t(currentSlide.descKey)}</Text>
-                </Animated.View>
-            </LinearGradient>
-        </Animated.View>
-
-        <View style={styles.footer}>
-            <View style={styles.pagination}>
-                {SLIDES.map((_, i) => (
-                    <View 
-                        key={i} 
-                        style={[
-                            styles.dot, 
-                            activeSlide === i && styles.activeDot,
-                            activeSlide === i && { backgroundColor: SLIDES[i].color }
-                        ]} 
-                    />
-                ))}
-            </View>
-
-            <Animated.View entering={FadeInDown.delay(400)} style={styles.buttonRow}>
-                <TouchableOpacity style={styles.primaryBtn} onPress={nextSlide}>
-                    <LinearGradient colors={['#7c3aed', '#5b21b6']} style={styles.btnInner}>
-                        <Text style={styles.btnText}>
-                            {activeSlide === SLIDES.length - 1 ? t('welcome.get_started') : t('game.next')}
-                        </Text>
-                        <ArrowRight size={20} color="white" />
-                    </LinearGradient>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.secondaryText}>{t('welcome.login')}</Text>
-                </TouchableOpacity>
-            </Animated.View>
-
-            <View style={styles.statsContainer}>
-                 <View style={styles.statItem}>
-                    <Text style={styles.statValue}>{stats.totalUsers}</Text>
-                    <Text style={styles.statLabel}>{t('dashboard.stats.learners')}</Text>
-                 </View>
-                 <View style={styles.statDivider} />
-                 <View style={styles.statItem}>
-                    <Text style={styles.statValue}>{stats.totalModules}</Text>
-                    <Text style={styles.statLabel}>{t('dashboard.stats.modules')}</Text>
-                 </View>
-                 <View style={styles.statDivider} />
-                 <View style={styles.statItem}>
-                    <Text style={styles.statValue}>{stats.totalLanguages}</Text>
-                    <Text style={styles.statLabel}>{t('dashboard.stats.langs')}</Text>
-                 </View>
-            </View>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.content}>
+          <Animated.View key={activeSlide} entering={ZoomIn.duration(600)} style={styles.cardContainer}>
+              <LinearGradient colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.05)']} style={styles.glassCard}>
+                  <View style={[styles.iconBox, { backgroundColor: currentSlide.color + '20', borderColor: currentSlide.color + '40' }]}>
+                      <currentSlide.icon size={50} color={currentSlide.color} />
+                      <Animated.View entering={ZoomIn.delay(300)} style={[styles.iconGlow, { backgroundColor: currentSlide.color }]} />
+                  </View>
+  
+                  <Animated.View entering={FadeInUp.delay(200)} style={styles.textColumn}>
+                      <Text style={styles.brand}>{t('app_name').toUpperCase()}</Text>
+                      <Text style={styles.title}>{t(currentSlide.titleKey)}</Text>
+                      <Text style={styles.description}>{t(currentSlide.descKey)}</Text>
+                  </Animated.View>
+              </LinearGradient>
+          </Animated.View>
+  
+          <View style={styles.footer}>
+              <View style={styles.pagination}>
+                  {SLIDES.map((_, i) => (
+                      <View 
+                          key={i} 
+                          style={[
+                              styles.dot, 
+                              activeSlide === i && styles.activeDot,
+                              activeSlide === i && { backgroundColor: SLIDES[i].color }
+                          ]} 
+                      />
+                  ))}
+              </View>
+  
+              <Animated.View entering={FadeInDown.delay(400)} style={styles.buttonRow}>
+                  <TouchableOpacity style={styles.primaryBtn} onPress={nextSlide}>
+                      <LinearGradient colors={['#7c3aed', '#5b21b6']} style={styles.btnInner}>
+                          <Text style={styles.btnText}>
+                              {activeSlide === SLIDES.length - 1 ? t('welcome.get_started') : t('game.next')}
+                          </Text>
+                          <ArrowRight size={20} color="white" />
+                      </LinearGradient>
+                  </TouchableOpacity>
+  
+                  <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('Login')}>
+                      <Text style={styles.secondaryText}>{t('welcome.login')}</Text>
+                  </TouchableOpacity>
+              </Animated.View>
+  
+              <View style={styles.statsContainer}>
+                   <View style={styles.statItem}>
+                      <Text style={styles.statValue}>{stats.totalUsers}</Text>
+                      <Text style={styles.statLabel}>{t('dashboard.stats.learners')}</Text>
+                   </View>
+                   <View style={styles.statDivider} />
+                   <View style={styles.statItem}>
+                      <Text style={styles.statValue}>{stats.totalModules}</Text>
+                      <Text style={styles.statLabel}>{t('dashboard.stats.modules')}</Text>
+                   </View>
+                   <View style={styles.statDivider} />
+                   <View style={styles.statItem}>
+                      <Text style={styles.statValue}>{stats.totalLanguages}</Text>
+                      <Text style={styles.statLabel}>{t('dashboard.stats.langs')}</Text>
+                   </View>
+              </View>
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -167,7 +180,8 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
   floatingIcon: { position: 'absolute', opacity: 0.2 },
-  content: { flex: 1, paddingHorizontal: 30, justifyContent: 'space-between', paddingVertical: height * 0.08 },
+  content: { paddingHorizontal: 30, justifyContent: 'space-between', paddingVertical: height * 0.05 },
+  scrollContent: { flexGrow: 1, minHeight: height },
   cardContainer: { flex: 1, justifyContent: 'center' },
   glassCard: { padding: 30, borderRadius: 40, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', alignItems: 'center' },
   iconBox: { width: 100, height: 100, borderRadius: 35, justifyContent: 'center', alignItems: 'center', borderWidth: 2, marginBottom: 30, position: 'relative' },

@@ -97,14 +97,20 @@ const StoriesScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.header}>
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
+            <View style={styles.header}>
                 <View style={styles.headerContent}>
                     <Text style={styles.headerTitle}>{t('stories.title') || 'Inspiring Journeys'}</Text>
                     <Text style={styles.headerSubtitle}>{t('stories.subtitle') || 'Learn from those who paved the way'}</Text>
                 </View>
-            </LinearGradient>
+            </View>
 
             <ScrollView 
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {setRefreshing(true); fetchStories();}} tintColor="#ec4899" />}
                 showsVerticalScrollIndicator={false}

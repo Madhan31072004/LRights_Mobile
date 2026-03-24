@@ -118,7 +118,11 @@ const FakeCallScreen = ({ navigation }) => {
     if (status === 'ringing') {
         return (
             <View style={styles.container}>
-                <LinearGradient colors={['#2c3e50', '#000000']} style={StyleSheet.absoluteFill} />
+                <LinearGradient 
+                  colors={['#2c3e50', '#000000']} 
+                  style={StyleSheet.absoluteFill} 
+                  pointerEvents="none"
+                />
 
                 <View style={styles.profileSection}>
                     <Animated.View style={[styles.avatarCircle, { transform: [{ scale: pulseAnim }] }]}>
@@ -142,7 +146,11 @@ const FakeCallScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#000000', '#1a1a1a']} style={StyleSheet.absoluteFill} />
+            <LinearGradient 
+              colors={['#000000', '#1a1a1a']} 
+              style={StyleSheet.absoluteFill} 
+              pointerEvents="none"
+            />
 
             {status === 'active' && hasCamPermission && (
                 <CameraView

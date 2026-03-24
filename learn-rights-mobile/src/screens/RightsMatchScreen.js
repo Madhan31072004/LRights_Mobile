@@ -204,7 +204,11 @@ Provide a summary of these rights and their importance in Indian Law.`;
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -220,6 +224,7 @@ Provide a summary of these rights and their importance in Indian Law.`;
             </View>
 
             <ScrollView 
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent} 
                 showsVerticalScrollIndicator={false}
             >

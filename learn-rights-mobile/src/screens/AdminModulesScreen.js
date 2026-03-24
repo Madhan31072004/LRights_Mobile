@@ -165,7 +165,11 @@ const AdminModulesScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -177,7 +181,10 @@ const AdminModulesScreen = ({ navigation }) => {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scroll}>
+            <ScrollView 
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scroll}
+            >
                 {modules.map((mod) => (
                     <View key={mod._id} style={styles.modCard}>
                         <TouchableOpacity 

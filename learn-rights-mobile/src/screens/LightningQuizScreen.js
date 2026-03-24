@@ -128,7 +128,11 @@ const LightningQuizScreen = ({ navigation, route }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -144,7 +148,10 @@ const LightningQuizScreen = ({ navigation, route }) => {
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView 
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scrollContent}
+            >
                 {questions.length === 0 && !loading ? (
                     <View style={styles.winOverlay}>
                         <Text style={styles.winSub}>{t('game.no_questions')}</Text>

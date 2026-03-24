@@ -159,7 +159,11 @@ const ModulesScreen = () => {
     const timerPct = ((REQUIRED_READING_SECONDS - readingTimer) / REQUIRED_READING_SECONDS) * 100;
     return (
       <View style={styles.container}>
-        <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+                <LinearGradient 
+            colors={['#0f0c29', '#1a1744']} 
+            style={styles.background} 
+            pointerEvents="none"
+        />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setSelectedSubTopic(null)}>
             <ChevronLeft color="white" size={28} />
@@ -271,14 +275,21 @@ const ModulesScreen = () => {
   if (selectedTopic) {
     return (
       <View style={styles.container}>
-        <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+                <LinearGradient 
+            colors={['#0f0c29', '#1a1744']} 
+            style={styles.background} 
+            pointerEvents="none"
+        />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setSelectedTopic(null)}>
             <ChevronLeft color="white" size={28} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{selectedTopic.title}</Text>
         </View>
-          <ScrollView contentContainerStyle={styles.scrollPadding}>
+          <ScrollView 
+              style={{ flex: 1 }}
+              contentContainerStyle={styles.scrollPadding}
+          >
             {selectedTopic.subTopics?.map((st, i) => {
                 const done = isSubTopicCompleted(st);
                 return (
@@ -323,14 +334,21 @@ const ModulesScreen = () => {
     const color = MOD_COLORS[selectedModule.code] || "#7c3aed";
     return (
       <View style={styles.container}>
-        <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+                <LinearGradient 
+            colors={['#0f0c29', '#1a1744']} 
+            style={styles.background} 
+            pointerEvents="none"
+        />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setSelectedModule(null)}>
             <ChevronLeft color="white" size={28} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>{selectedModule.title}</Text>
         </View>
-        <ScrollView contentContainerStyle={styles.scrollPadding}>
+        <ScrollView 
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.scrollPadding}
+        >
           {selectedModule.topics?.map((topic, i) => (
             <Animated.View entering={FadeInUp.delay(i * 100)} key={i}>
               <TouchableOpacity style={styles.topicCard} onPress={() => setSelectedTopic(topic)}>
@@ -364,7 +382,11 @@ const ModulesScreen = () => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#302b63', '#24243e']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       <View style={styles.hero}>
         <BookOpen color="#7c3aed" size={40} />
@@ -398,6 +420,7 @@ const ModulesScreen = () => {
       </View>
 
       <ScrollView 
+        style={{ flex: 1 }}
         contentContainerStyle={styles.grid}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
       >

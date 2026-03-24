@@ -185,13 +185,18 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#1a1744']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       {/* Background Orbs */}
-      <Animated.View entering={ZoomIn.delay(200)} style={[styles.orb, { top: -50, left: -50, width: 250, height: 250, backgroundColor: 'rgba(124, 58, 237, 0.1)' }]} />
-      <Animated.View entering={ZoomIn.delay(500)} style={[styles.orb, { bottom: 100, right: -100, width: 300, height: 300, backgroundColor: 'rgba(236, 72, 153, 0.05)' }]} />
+      <Animated.View pointerEvents="none" entering={ZoomIn.delay(200)} style={[styles.orb, { top: -50, left: -50, width: 250, height: 250, backgroundColor: 'rgba(124, 58, 237, 0.1)' }]} />
+      <Animated.View pointerEvents="none" entering={ZoomIn.delay(500)} style={[styles.orb, { bottom: 100, right: -100, width: 300, height: 300, backgroundColor: 'rgba(236, 72, 153, 0.05)' }]} />
       
       <ScrollView 
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent} 
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}

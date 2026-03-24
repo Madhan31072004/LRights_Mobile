@@ -76,7 +76,11 @@ const QuizScreen = ({ route, navigation }) => {
   if (result) {
     return (
       <View style={styles.container}>
-        <LinearGradient colors={['#0f0c29', '#302b63']} style={styles.background} />
+        <LinearGradient 
+          colors={['#0f0c29', '#302b63']} 
+          style={styles.background} 
+          pointerEvents="none"
+        />
         
         {!showReview ? (
           <Animated.View entering={FadeInUp} style={styles.resultCard}>
@@ -116,7 +120,7 @@ const QuizScreen = ({ route, navigation }) => {
                   </TouchableOpacity>
                   <Text style={styles.reviewHeaderTitle}>{t('quiz.review_answers', { defaultValue: 'Review' })}</Text>
               </View>
-              <ScrollView style={styles.reviewList}>
+              <ScrollView style={[styles.reviewList, { flex: 1 }]}>
                   {questions.map((q, i) => {
                       const userAns = result.answers[i];
                       const isCorrect = userAns === q.correctAnswer;
@@ -175,7 +179,11 @@ const QuizScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#1a1744']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       <View style={styles.quizHeader}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -205,7 +213,10 @@ const QuizScreen = ({ route, navigation }) => {
           </ScrollView>
       </View>
 
-      <ScrollView contentContainerStyle={styles.quizBody}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.quizBody}
+      >
           <Text style={styles.question}>{q?.question}</Text>
           <View style={styles.options}>
               {q?.options.map((opt, i) => (

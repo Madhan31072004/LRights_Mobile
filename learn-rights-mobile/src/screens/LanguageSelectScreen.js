@@ -25,11 +25,15 @@ const LanguageSelectScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f172a', '#1e1b4b']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f172a', '#1e1b4b']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       {/* Decorative background shapes */}
-      <View style={[styles.bgShape, { top: -100, left: -100, backgroundColor: '#4c1d95' }]} />
-      <View style={[styles.bgShape, { bottom: -100, right: -100, backgroundColor: '#1e3a8a' }]} />
+      <View pointerEvents="none" style={[styles.bgShape, { top: -100, left: -100, backgroundColor: '#4c1d95' }]} />
+      <View pointerEvents="none" style={[styles.bgShape, { bottom: -100, right: -100, backgroundColor: '#1e3a8a' }]} />
 
       <ScrollView 
         style={{ flex: 1 }}

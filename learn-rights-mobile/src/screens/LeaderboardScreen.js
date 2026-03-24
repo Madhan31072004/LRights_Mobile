@@ -74,9 +74,14 @@ const LeaderboardScreen = () => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#302b63', '#24243e']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       <ScrollView 
+        style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
       >

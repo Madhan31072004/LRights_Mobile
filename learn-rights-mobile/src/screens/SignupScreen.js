@@ -115,7 +115,11 @@ const SignupScreen = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#302b63', '#24243e']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       <ScrollView 
         style={{ flex: 1 }}

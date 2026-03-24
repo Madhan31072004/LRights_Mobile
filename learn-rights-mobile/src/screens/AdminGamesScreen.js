@@ -93,7 +93,11 @@ const AdminGamesScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -110,6 +114,7 @@ const AdminGamesScreen = ({ navigation }) => {
             </View>
 
             <ScrollView 
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#f59e0b" />}
             >

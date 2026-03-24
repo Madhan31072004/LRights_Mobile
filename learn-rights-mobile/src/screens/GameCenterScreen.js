@@ -60,7 +60,11 @@ const GameCenterScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.background} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -75,7 +79,11 @@ const GameCenterScreen = ({ navigation }) => {
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView 
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scrollContent} 
+                showsVerticalScrollIndicator={false}
+            >
                 <Animated.View entering={FadeInUp} style={styles.timerCard}>
                     <LinearGradient colors={['rgba(124, 58, 237, 0.1)', 'rgba(0,0,0,0)']} style={styles.timerGradient}>
                         <Clock size={16} color="#a78bfa" />

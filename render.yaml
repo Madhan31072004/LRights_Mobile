@@ -2,7 +2,7 @@ services:
   # LearnRights Backend (FastAPI)
   - type: web
     name: learn-rights-backend
-    env: python
+    runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /

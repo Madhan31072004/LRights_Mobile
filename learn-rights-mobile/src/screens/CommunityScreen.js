@@ -156,7 +156,11 @@ const CommunityScreen = () => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.header}>
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={styles.header}
+                pointerEvents="box-none"
+            >
                 <View style={styles.headerContent}>
                     <Text style={styles.headerTitle}>{t('community.title') || 'Community Hub'}</Text>
                     <Text style={styles.headerSubtitle}>{t('community.subtitle') || 'Join the conversation & empower others'}</Text>
@@ -169,6 +173,7 @@ const CommunityScreen = () => {
             </LinearGradient>
 
             <ScrollView 
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7c3aed" />}
                 showsVerticalScrollIndicator={false}

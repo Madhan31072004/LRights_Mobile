@@ -124,7 +124,11 @@ const ChatbotScreen = () => {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#1a1744']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
       <View style={styles.header}>
           <Bot size={32} color="#7c3aed" />
@@ -141,6 +145,7 @@ const ChatbotScreen = () => {
       </View>
 
       <ScrollView 
+        style={{ flex: 1 }}
         ref={scrollRef}
         contentContainerStyle={styles.messageList}
         onContentSizeChange={() => scrollRef.current.scrollToEnd({ animated: true })}

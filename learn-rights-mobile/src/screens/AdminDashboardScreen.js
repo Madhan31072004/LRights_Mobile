@@ -55,9 +55,16 @@ const AdminDashboardScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#1a1744']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+      >
         <View style={styles.header}>
             <ShieldCheck size={40} color="#7c3aed" />
             <Text style={styles.title}>{t('admin.dashboard.title')}</Text>

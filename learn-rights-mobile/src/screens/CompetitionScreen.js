@@ -131,6 +131,7 @@ const CompetitionScreen = () => {
             </LinearGradient>
 
             <ScrollView 
+                style={{ flex: 1 }}
                 contentContainerStyle={styles.scrollContent}
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {setRefreshing(true); fetchCompetitions();}} tintColor="#f59e0b" />}
                 showsVerticalScrollIndicator={false}

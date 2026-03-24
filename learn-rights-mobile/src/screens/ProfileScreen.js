@@ -185,9 +185,16 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.background} />
+      <LinearGradient 
+        colors={['#0f0c29', '#302b63', '#24243e']} 
+        style={styles.background} 
+        pointerEvents="none"
+      />
       
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Header */}
         <View style={styles.profileHeader}>
             <View style={styles.avatarContainer}>

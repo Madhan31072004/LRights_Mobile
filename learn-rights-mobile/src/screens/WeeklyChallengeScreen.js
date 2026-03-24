@@ -114,7 +114,11 @@ const WeeklyChallengeScreen = () => {
     if (loading) {
         return (
             <View style={[styles.container, styles.center]}>
-                <LinearGradient colors={['#0f0c29', '#1a1744']} style={StyleSheet.absoluteFill} />
+                <LinearGradient 
+                    colors={['#0f0c29', '#1a1744']} 
+                    style={StyleSheet.absoluteFill} 
+                    pointerEvents="none"
+                />
                 <ActivityIndicator size="large" color="#f59e0b" />
                 <Text style={styles.loadingText}>{t('game.weekly.generating')}</Text>
             </View>
@@ -124,7 +128,11 @@ const WeeklyChallengeScreen = () => {
     if (isStarting) {
         return (
             <View style={[styles.container, styles.center]}>
-                <LinearGradient colors={['#0f0c29', '#1a1744']} style={StyleSheet.absoluteFill} />
+                <LinearGradient 
+                    colors={['#0f0c29', '#1a1744']} 
+                    style={StyleSheet.absoluteFill} 
+                    pointerEvents="none"
+                />
                 <Animated.View entering={FadeInUp} style={styles.startCard}>
                      <Trophy size={60} color="#f59e0b" style={{ alignSelf: 'center', marginBottom: 20 }} />
                      <Text style={styles.startTitle}>{t('game.weekly.title')}</Text>
@@ -151,7 +159,11 @@ const WeeklyChallengeScreen = () => {
         const pct = Math.round((score / questions.length) * 100) || 0;
         return (
             <View style={[styles.container, styles.center]}>
-                <LinearGradient colors={['#0f0c29', '#1a1744']} style={StyleSheet.absoluteFill} />
+                <LinearGradient 
+                    colors={['#0f0c29', '#1a1744']} 
+                    style={StyleSheet.absoluteFill} 
+                    pointerEvents="none"
+                />
                 <Animated.View entering={ZoomIn} style={styles.resultCard}>
                     <Trophy size={80} color={pct >= 80 ? '#fbbf24' : '#94a3b8'} style={{ alignSelf: 'center' }} />
                     <Text style={styles.resultTitle}>{pct >= 80 ? t('game.weekly.masterful') : t('game.weekly.good_effort')}</Text>
@@ -170,7 +182,11 @@ const WeeklyChallengeScreen = () => {
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={['#0f0c29', '#1a1744']} style={StyleSheet.absoluteFill} />
+            <LinearGradient 
+                colors={['#0f0c29', '#1a1744']} 
+                style={StyleSheet.absoluteFill} 
+                pointerEvents="none"
+            />
             
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
@@ -186,7 +202,10 @@ const WeeklyChallengeScreen = () => {
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollArea}>
+            <ScrollView 
+                style={{ flex: 1 }}
+                contentContainerStyle={styles.scrollArea}
+            >
                 <View style={styles.progressRow}>
                     <Text style={styles.progressText}>{t('game.question_n_of_m', { n: currentQ + 1, m: questions.length })}</Text>
                     <View style={styles.progBg}>
