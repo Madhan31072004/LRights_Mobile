@@ -1,0 +1,19 @@
+{
+  "welcome": "ਲਰਨ ਰਾਈਟਸ ਵਿੱਚ ਸਵਾਗਤ ਹੈ",
+  "selectLanguage": "ਭਾਸ਼ਾ ਚੁਣੋ",
+  "login": "ਲੌਗਇਨ",
+  "signup": "ਸਾਈਨ ਅੱਪ",
+  "dashboard": "ਡੈਸ਼ਬੋਰਡ",
+  "profile": "ਪ੍ਰੋਫਾਈਲ",
+  "home": "ਹੋਮ",
+  "logout": "ਲੌਗ ਆਉਟ",
+  "username": "ਯੂਜ਼ਰ ਨਾਮ",
+  "password": "ਪਾਸਵਰਡ",
+  "email": "ਈਮੇਲ",
+  "fullName": "ਪੂਰਾ ਨਾਮ",
+  "submit": "ਜਮ੍ਹਾ ਕਰੋ",
+  "cancel": "ਰੱਦ ਕਰੋ",
+  "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...",
+  "error": "ਗਲਤੀ",
+  "success": "ਸਫਲਤਾ"
+}

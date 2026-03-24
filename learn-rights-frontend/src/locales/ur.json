@@ -1,0 +1,19 @@
+{
+  "welcome": "لرن رائٹس میں خوش آمدید",
+  "selectLanguage": "زبان منتخب کریں",
+  "login": "لاگ ان",
+  "signup": "سائن اپ",
+  "dashboard": "ڈیش بورڈ",
+  "profile": "پروفائل",
+  "home": "ہوم",
+  "logout": "لاگ آؤٹ",
+  "username": "صارف نام",
+  "password": "پاس ورڈ",
+  "email": "ای میل",
+  "fullName": "پورا نام",
+  "submit": "جمع کرائیں",
+  "cancel": "منسوخ کریں",
+  "loading": "لوڈ ہو رہا ہے...",
+  "error": "خرابی",
+  "success": "کامیابی"
+}

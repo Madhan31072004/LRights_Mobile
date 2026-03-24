@@ -1,0 +1,19 @@
+{
+  "welcome": "लर्न राइट्समध्ये आपले स्वागत",
+  "selectLanguage": "भाषा निवडा",
+  "login": "लॉग इन",
+  "signup": "साइन अप",
+  "dashboard": "डॅशबोर्ड",
+  "profile": "प्रोफाइल",
+  "home": "होम",
+  "logout": "लॉग आउट",
+  "username": "वापरकर्ता नाव",
+  "password": "पासवर्ड",
+  "email": "ईमेल",
+  "fullName": "पूर्ण नाव",
+  "submit": "सबमिट करा",
+  "cancel": "रद्द करा",
+  "loading": "लोड होत आहे...",
+  "error": "त्रुटी",
+  "success": "यश"
+}

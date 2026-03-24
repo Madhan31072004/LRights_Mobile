@@ -1,0 +1,28 @@
+services:
+  # LearnRights Backend (FastAPI)
+  - type: web
+    name: learn-rights-backend
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:10000
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GOOGLE_AI_API_KEY
+        sync: false
+    rootDir: learn-rights-python
+
+  # LearnRights Frontend (React)
+  - type: static_site
+    name: learn-rights-frontend
+    buildCommand: npm install && npm run build
+    publishDir: build
+    rootDir: learn-rights-frontend
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: learn-rights-backend
+          property: host

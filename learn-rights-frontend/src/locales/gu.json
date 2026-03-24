@@ -1,0 +1,19 @@
+{
+  "welcome": "લર્ન રાઇટ્સમાં સ્વાગત છે",
+  "selectLanguage": "ભાષા પસંદ કરો",
+  "login": "લોગિન",
+  "signup": "સાઇન અપ",
+  "dashboard": "ડેશબોર્ડ",
+  "profile": "પ્રોફાઇલ",
+  "home": "હોમ",
+  "logout": "લોગ આઉટ",
+  "username": "વપરાશકર્તા નામ",
+  "password": "પાસવર્ડ",
+  "email": "ઇમેઇલ",
+  "fullName": "પૂરું નામ",
+  "submit": "સબમિટ કરો",
+  "cancel": "રદ કરો",
+  "loading": "લોડ થઈ રહ્યું છે...",
+  "error": "ભૂલ",
+  "success": "સફળતા"
+}

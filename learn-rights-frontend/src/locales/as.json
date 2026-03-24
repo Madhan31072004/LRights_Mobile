@@ -1,0 +1,19 @@
+{
+  "welcome": "লাৰ্ন ৰাইটছত স্বাগতম",
+  "selectLanguage": "ভাষা বাছনি কৰক",
+  "login": "লগিন",
+  "signup": "চাইন আপ",
+  "dashboard": "ডেশ্ববোৰ্ড",
+  "profile": "প্ৰফাইল",
+  "home": "হোম",
+  "logout": "লগ আউট",
+  "username": "ব্যৱহাৰকাৰী নাম",
+  "password": "পাছৱৰ্ড",
+  "email": "ইমেইল",
+  "fullName": "সম্পূৰ্ণ নাম",
+  "submit": "জমা দিয়ক",
+  "cancel": "বাতিল কৰক",
+  "loading": "লোড হৈ আছে...",
+  "error": "ভুল",
+  "success": "সফলতা"
+}

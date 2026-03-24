@@ -1,0 +1,78 @@
+.legal-icon {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #4f46e5;
+  color: white;
+  font-size: 26px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.legal-chat {
+  position: fixed;
+  bottom: 100px;
+  right: 25px;
+  width: 320px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.legal-header {
+  background: #4f46e5;
+  color: white;
+  padding: 12px;
+  border-radius: 12px 12px 0 0;
+  font-weight: bold;
+}
+
+.legal-body {
+  padding: 10px;
+  height: 260px;
+  overflow-y: auto;
+}
+
+.msg {
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.msg.bot {
+  background: #eef2ff;
+}
+
+.msg.user {
+  background: #4f46e5;
+  color: white;
+  text-align: right;
+}
+
+.legal-input {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+}
+
+.legal-input input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+}
+
+.legal-input button {
+  border: none;
+  background: #4f46e5;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+}
