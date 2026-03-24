@@ -30,6 +30,7 @@ export const UserProvider = ({ children }) => {
     const init = async () => {
       try {
         const storedToken = await AsyncStorage.getItem('token');
+        const storedUserId = await AsyncStorage.getItem('userId');
         const storedLang = await AsyncStorage.getItem('language') || 'en';
         setLanguage(storedLang);
 
@@ -44,12 +45,28 @@ export const UserProvider = ({ children }) => {
         if (cachedProg) setProgress(cachedProg);
 
         if (storedToken) {
+          // Pre-set token and userId if we have them cached
           setToken(storedToken);
-          const res = await API.get('/auth/me');
-          setUserId(res.data.id);
-          await AsyncStorage.setItem('userId', res.data.id);
+          if (storedUserId) setUserId(storedUserId);
+
+          try {
+            const res = await API.get('/auth/me');
+            if (res.data && res.data.id) {
+              setUserId(res.data.id);
+              await AsyncStorage.setItem('userId', res.data.id);
+            } else {
+              throw new Error("Invalid user profile");
+            }
+          } catch (apiErr) {
+            console.warn('Silent auth verification failed:', apiErr.message);
+            // If it's a definitive 401, clear session. 
+            // Otherwise (network error), keep cached userId and rely on offline mode.
+            if (apiErr.response?.status === 401) {
+              await logout();
+            }
+          }
         } else {
-          refreshUserData(false, storedLang);
+          await refreshUserData(false, storedLang);
         }
       } catch (err) {
         console.error('Initial load error:', err);

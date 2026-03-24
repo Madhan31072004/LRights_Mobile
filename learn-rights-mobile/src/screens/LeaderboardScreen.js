@@ -62,7 +62,9 @@ const LeaderboardScreen = () => {
   };
 
   const getAvatar = (u) => {
-    if (u.profilePhoto) return { uri: `http://10.0.2.2:5000${u.profilePhoto}` };
+    // Dynamically derive the host for profile photos
+    const apiHost = API.defaults.baseURL.replace('/api', '');
+    if (u.profilePhoto) return { uri: `${apiHost}${u.profilePhoto}` };
     return { uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name || "U")}&background=random&color=fff&size=80&bold=true&font-size=0.4` };
   };
 

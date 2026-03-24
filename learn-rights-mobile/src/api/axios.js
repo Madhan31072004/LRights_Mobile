@@ -5,7 +5,8 @@ import { enqueueOfflineAction } from '../utils/offlineDB';
 // IMPORTANT: Using LAN IP for maximum stability (no expiration)
 // Make sure your phone and computer are on the same Wi-Fi!
 // Dynamically use PROD or LOCAL API URL
-const prodURL = process.env.EXPO_PUBLIC_API_URL || "https://lrights-mobile-python.onrender.com/api";
+const prodURL = "https://lrights-mobile-python.onrender.com/api";
+const stagingURL = "https://lrights-mobile-python.onrender.com/api"; // Default to prod if local fails
 const baseURL = process.env.NODE_ENV === 'production' 
   ? prodURL 
   : (process.env.EXPO_PUBLIC_API_URL || "http://192.168.139.150:5000/api");
