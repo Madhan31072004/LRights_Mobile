@@ -77,7 +77,7 @@ export const enqueueOfflineAction = async (action) => {
     await setItem(KEYS.OFFLINE_QUEUE, queue);
 };
 
-export const getOfflineQueue = () => getItem(KEYS.OFFLINE_QUEUE);
+export const getOfflineQueue = async () => (await getItem(KEYS.OFFLINE_QUEUE)) || [];
 
 export const removeFromQueue = async (id) => {
     const queue = await getItem(KEYS.OFFLINE_QUEUE) || [];
