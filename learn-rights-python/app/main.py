@@ -42,20 +42,35 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="LearnRights API", version="1.0.0", lifespan=lifespan)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://lrights-mobile.onrender.com",
-        "https://learn-rights-mobile.onrender.com",
-        "https://learn-rights.onrender.com",
-        "http://localhost:3000",
-        "http://localhost:19006",
-    ],
-    allow_origin_regex="https://.*\\.onrender\\.com",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from fastapi import Request, Response
+
+@app.middleware("http")
+async def manual_cors_middleware(request: Request, call_next):
+    # Aggressive CORS Handling
+    if request.method == "OPTIONS":
+        response = Response()
+        response.status_code = 204
+    else:
+        response = await call_next(request)
+
+    origin = request.headers.get("origin")
+    # Allow all onrender.com subdomains and localhost
+    if origin and (".onrender.com" in origin or "localhost" in origin or "127.0.0.1" in origin):
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Bypass-Tunnel-Reminder, X-Requested-With"
+    elif not origin:
+        # Fallback for non-browser requests
+        response.headers["Access-Control-Allow-Origin"] = "*"
+    
+    return response
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url} Origin: {request.headers.get('origin')}")
+    response = await call_next(request)
+    return response
 
 # Mount API routes under /api to match frontend baseURL
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
