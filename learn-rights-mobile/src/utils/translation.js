@@ -458,15 +458,17 @@ const englishStrings = {
 };
 
 let cachedTranslations = {};
-let currentLanguage = 'en';
+let currentLanguage = null;
 let listeners = [];
 
 export const initTranslation = async () => {
     try {
-        currentLanguage = await AsyncStorage.getItem('language') || 'en';
-        const stored = await AsyncStorage.getItem(`translations_${currentLanguage}`);
-        if (stored) {
-            cachedTranslations = JSON.parse(stored);
+        currentLanguage = await AsyncStorage.getItem('language');
+        if (currentLanguage) {
+            const stored = await AsyncStorage.getItem(`translations_${currentLanguage}`);
+            if (stored) {
+                cachedTranslations = JSON.parse(stored);
+            }
         }
     } catch (e) {
         console.error("Translation init error", e);

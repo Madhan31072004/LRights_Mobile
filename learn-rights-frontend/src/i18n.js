@@ -11,6 +11,8 @@ import pa from './locales/pa.json';
 import ml from './locales/ml.json';
 import as from './locales/as.json';
 import te from './locales/te.json';
+import mr from './locales/mr.json';
+import ur from './locales/ur.json';
 
 const resources = {
   en: { translation: en },
