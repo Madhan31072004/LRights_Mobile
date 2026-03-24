@@ -122,7 +122,7 @@ const WelcomeScreen = ({ navigation }) => {
                       style={({ pressed }) => [styles.downloadApkBtn, pressed && { opacity: 0.8 }]}
                       onPress={() => {
                           const link = document.createElement('a');
-                          link.href = 'https://expo.dev/artifacts/eas/fPJcVeSPSmDRDseV6rNLt4.apk';
+                          link.href = 'https://expo.dev/artifacts/eas/cvBbh9ySmkRNicvN3DU3dr.apk';
                           link.download = 'learn-rights.apk';
                           link.target = '_blank';
                           link.click();

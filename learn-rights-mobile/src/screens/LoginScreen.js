@@ -30,7 +30,7 @@ const LoginScreen = ({ navigation }) => {
 
   // Google Auth Hook - Using separate IDs for Android/iOS/Web
   const googleConfig = {
-    androidClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
+    androidClientId: "1034415973183-piv5n8eqma8jdf394g95uv0s5fhpp6di.apps.googleusercontent.com",
     iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
