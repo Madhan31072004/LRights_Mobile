@@ -4,8 +4,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Home, BookOpen, MessageSquare, Trophy, User, ShieldCheck, Users } from 'lucide-react-native';
+import { enableScreens } from 'react-native-screens';
+
+if (Platform.OS === 'web') {
+  enableScreens(false);
+}
 
 import { UserProvider, useUser } from './src/contexts/UserContext';
 import { SafetyModeProvider } from './src/contexts/SafetyModeContext';

@@ -250,6 +250,7 @@ export const SafetyModeProvider = ({ children }) => {
         let isTriggering = false;
 
         const _subscribe = () => {
+            if (Platform.OS === 'web') return; // Accelerometer not supported on web for this specific implementation
             setSubscription(
                 Accelerometer.addListener(data => {
                     if (!shakeEnabled) return;
@@ -286,6 +287,7 @@ export const SafetyModeProvider = ({ children }) => {
         };
 
         const _unsubscribe = () => {
+            if (Platform.OS === 'web') return;
             subscription && subscription.remove();
             setSubscription(null);
         };
