@@ -108,6 +108,30 @@ const WelcomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {Platform.OS === 'web' && (
+          <Animated.View entering={FadeInDown.delay(800)} style={styles.apkBanner}>
+              <View style={styles.apkBannerContent}>
+                  <View style={styles.apkIconBox}>
+                      <ShieldCheck size={20} color="#10b981" />
+                  </View>
+                  <View style={styles.apkTextColumn}>
+                      <Text style={styles.apkBannerTitle}>Get the Native App</Text>
+                      <Text style={styles.apkBannerSubtitle}>Download our Android APK for the best experience.</Text>
+                  </View>
+                  <Pressable 
+                      style={({ pressed }) => [styles.downloadApkBtn, pressed && { opacity: 0.8 }]}
+                      onPress={() => {
+                          const link = document.createElement('a');
+                          link.href = '/download/learn-rights.apk';
+                          link.download = 'learn-rights.apk';
+                          link.click();
+                      }}
+                  >
+                      <Text style={styles.downloadApkText}>Download</Text>
+                  </Pressable>
+              </View>
+          </Animated.View>
+        )}
         <View style={styles.content}>
           <Animated.View key={activeSlide} entering={ZoomIn.duration(600)} style={styles.cardContainer}>
               <LinearGradient colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.05)']} style={styles.glassCard}>
@@ -210,7 +234,54 @@ const styles = StyleSheet.create({
   statItem: { alignItems: 'center' },
   statValue: { color: 'white', fontSize: 20, fontWeight: '900' },
   statLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: '800', textTransform: 'uppercase', marginTop: 3 },
-  statDivider: { width: 1, height: 25, backgroundColor: 'rgba(255,255,255,0.1)' }
+  statDivider: { width: 1, height: 25, backgroundColor: 'rgba(255,255,255,0.1)' },
+  apkBanner: {
+    marginHorizontal: 30,
+    marginTop: 20,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+    overflow: 'hidden'
+  },
+  apkBannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    gap: 12
+  },
+  apkIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  apkTextColumn: {
+    flex: 1
+  },
+  apkBannerTitle: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '800'
+  },
+  apkBannerSubtitle: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 11,
+    fontWeight: '500'
+  },
+  downloadApkBtn: {
+    backgroundColor: '#10b981',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 12
+  },
+  downloadApkText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '800'
+  }
 });
 
 export default WelcomeScreen;
