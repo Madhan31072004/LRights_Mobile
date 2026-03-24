@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "learn-rights-mobile",
-    "slug": "learn-rights-mobile",
+    "slug": "learn-rights",
     "scheme": "learnrights",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,7 +24,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -36,6 +40,12 @@
       "expo-web-browser",
       "expo-audio",
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "46fcc45c-2d06-4a18-a4a1-6672ba17a018"
+      }
+    },
+    "owner": "teansms"
   }
 }
