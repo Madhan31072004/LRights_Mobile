@@ -7,8 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "npx expo install react-dom react-native-web && expo export --platform web",
-    "vercel-build": "EXPO_UNSAFE_IGNORE_WEB_DEPENDENCY_CHECKS=1 NODE_OPTIONS=--max-old-space-size=4096 npm run build:web"
+    "build:web": "npx expo install react-dom react-native-web && expo export --platform web"
   },
   "engines": {
     "node": ">=18.0.0"

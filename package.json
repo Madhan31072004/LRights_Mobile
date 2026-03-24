@@ -3,7 +3,6 @@
   "version": "1.0.1",
   "private": true,
   "scripts": {
-    "build": "npm run vercel-build",
-    "vercel-build": "cd frontend && npm install --legacy-peer-deps && npm run build:web && cp dist/index.html dist/404.html && cd .. && mkdir -p deploy_out && cp -rf frontend/dist/* deploy_out/"
+    "build": "echo 'Build handled by individual services' "
   }
 }
