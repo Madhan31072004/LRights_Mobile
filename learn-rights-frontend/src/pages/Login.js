@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { loginUser } from "../services/authService";
+import { loginUser, googleLoginUser } from "../services/authService";
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import "./Login.css";
 
 const Login = () => {
@@ -156,12 +157,12 @@ const Login = () => {
           </div>
 
           {/* Social Login Options */}
-          <div className="social-login">
-            <button className="social-button google">
-              <span className="social-icon">🌐</span>
-              {t("login.continue_google", { defaultValue: "Continue with Google" })}
-            </button>
-          </div>
+          <GoogleLoginButton 
+            setLoading={setLoading} 
+            setError={setError} 
+            navigate={navigate} 
+            t={t}
+          />
 
           {/* Sign Up Link */}
           <div className="signup-section">
@@ -185,6 +186,37 @@ const Login = () => {
           </p>
         </div>
       </div>
+    </div>
+  );
+};
+
+const GoogleLoginButton = ({ setLoading, setError, navigate, t }) => {
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      try {
+        const res = await googleLoginUser(tokenResponse.access_token);
+        localStorage.setItem("token", res.token);
+        navigate("/home");
+      } catch (err) {
+        setError(err.message || "Google Login failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => setError("Google Login failed"),
+  });
+
+  return (
+    <div className="social-login">
+      <button 
+        className="social-button google" 
+        onClick={() => login()}
+        type="button"
+      >
+        <span className="social-icon">🌐</span>
+        {t("login.continue_google", { defaultValue: "Continue with Google" })}
+      </button>
     </div>
   );
 };

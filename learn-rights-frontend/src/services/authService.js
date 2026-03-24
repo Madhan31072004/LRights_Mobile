@@ -10,6 +10,16 @@ export const loginUser = async (data) => {
   }
 };
 
+/* ---------------- GOOGLE LOGIN ---------------- */
+export const googleLoginUser = async (accessToken) => {
+  try {
+    const response = await axios.post("/auth/google", { access_token: accessToken });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Google login failed");
+  }
+};
+
 /* ---------------- SIGNUP ---------------- */
 export const signupUser = async (data) => {
   try {

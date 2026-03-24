@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { signupUser } from "../services/authService";
+import { signupUser, googleLoginUser } from "../services/authService";
+import { useGoogleLogin } from '@react-oauth/google';
 import "./Signup.css";
 
 const Signup = () => {
@@ -257,7 +258,17 @@ const Signup = () => {
             </button>
           </form>
 
-          {/* Login Link */}
+          {/* Social Sign Up Options */}
+          <div className="divider">
+            <span className="divider-text">{t('auth.or', { defaultValue: 'or' })}</span>
+          </div>
+          
+          <GoogleSignupButton 
+            setLoading={setLoading} 
+            setError={setError} 
+            navigate={navigate} 
+            t={t} 
+          />
           <div className="login-link">
             <p className="login-text">
               {t('auth.alreadyHaveAccount', { defaultValue: 'Already have an account?' })}
@@ -281,6 +292,54 @@ const Signup = () => {
           </p>
         </div>
       </div>
+    </div>
+  );
+};
+
+const GoogleSignupButton = ({ setLoading, setError, navigate, t }) => {
+  const login = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      try {
+        const res = await googleLoginUser(tokenResponse.access_token);
+        localStorage.setItem("token", res.token);
+        navigate("/home");
+      } catch (err) {
+        setError(err.message || "Google Signup failed");
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => setError("Google Signup failed"),
+  });
+
+  return (
+    <div className="social-signup">
+      <button 
+        className="social-button google" 
+        onClick={() => login()}
+        type="button"
+        style={{
+          width: '100%',
+          padding: '14px',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          color: 'white',
+          fontSize: '16px',
+          fontWeight: '600',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '12px',
+          cursor: 'pointer',
+          transition: 'all 0.3s ease',
+          marginBottom: '20px'
+        }}
+      >
+        <span className="social-icon">🌐</span>
+        {t("auth.continue_google", { defaultValue: "Continue with Google" })}
+      </button>
     </div>
   );
 };
