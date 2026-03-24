@@ -59,13 +59,16 @@ const SignupScreen = ({ navigation }) => {
   }, [response]);
 
   const handleGoogleSignup = async (token) => {
+    console.log("Sending token to backend:", token ? "Token present" : "Token MISSING");
     setLoading(true);
     try {
       const res = await googleLoginUser(token);
+      console.log("Backend Google Auth Response:", res);
       if (res.token) {
         await login(res.token);
       }
     } catch (err) {
+      console.error("Google Auth Backend Error:", err);
       setError(err.message || 'Google Signup failed');
     } finally {
       setLoading(false);
@@ -100,10 +103,14 @@ const SignupScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.container}>
       <LinearGradient colors={['#0f0c29', '#302b63', '#24243e']} style={styles.background} />
       
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
         <View style={styles.header}>
           <View style={styles.logoBox}>
             <ShieldCheck size={40} color="#7c3aed" />
@@ -160,11 +167,13 @@ const SignupScreen = ({ navigation }) => {
               onPress={() => promptAsync()}
               disabled={!request || loading}
             >
-              <View style={styles.googleIconG}>
-                <View style={styles.gRed} />
-                <View style={styles.gBlue} />
-                <View style={styles.gYellow} />
-                <View style={styles.gGreen} />
+              <View style={styles.googleIconWrapper}>
+                <View style={styles.googleIconG}>
+                  <View style={styles.gRed} />
+                  <View style={styles.gBlue} />
+                  <View style={styles.gYellow} />
+                  <View style={styles.gGreen} />
+                </View>
               </View>
               <Text style={styles.googleBtnText}>{t('auth.signup.google')}</Text>
             </TouchableOpacity>
@@ -184,15 +193,15 @@ const SignupScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
-  scrollContent: { flexGrow: 1, paddingHorizontal: 30, paddingTop: 60, paddingBottom: 40 },
+  scrollContent: { flexGrow: 1, paddingHorizontal: 30, paddingTop: 60, paddingBottom: 60 },
   header: { alignItems: 'center', marginBottom: 40 },
   logoBox: { width: 80, height: 80, borderRadius: 25, backgroundColor: 'rgba(124,58,237,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
   title: { color: 'white', fontSize: 28, fontWeight: '800' },
   subtitle: { color: 'rgba(255,255,255,0.5)', fontSize: 14, textAlign: 'center', marginTop: 8 },
-  form: { gap: 15 },
-  inputWrapper: { height: 60, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 18, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  form: { width: '100%' },
+  inputWrapper: { height: 60, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 18, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, gap: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', marginBottom: 15 },
   input: { flex: 1, color: 'white', fontSize: 16 },
-  button: { height: 60, backgroundColor: '#7c3aed', borderRadius: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10 },
+  button: { height: 60, backgroundColor: '#7c3aed', borderRadius: 18, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, marginTop: 10, marginBottom: 15 },
   buttonText: { color: 'white', fontSize: 18, fontWeight: '700' },
   errorText: { color: '#ef4444', textAlign: 'center', marginBottom: 20, fontWeight: '600' },
   footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 30 },

@@ -48,13 +48,16 @@ const LoginScreen = ({ navigation }) => {
   }, [response]);
 
   const handleGoogleLogin = async (token) => {
+    console.log("Sending token to backend:", token ? "Token present" : "Token MISSING");
     setLoading(true);
     try {
       const res = await googleLoginUser(token);
+      console.log("Backend Google Auth Response:", res);
       if (res.token) {
         await login(res.token);
       }
     } catch (err) {
+      console.error("Google Auth Backend Error:", err);
       setError(err.message || 'Google Login failed');
     } finally {
       setLoading(false);
@@ -91,7 +94,11 @@ const LoginScreen = ({ navigation }) => {
         style={styles.background}
       />
       
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent} 
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.header}>
           <ShieldCheck size={50} color="#7c3aed" />
           <Text style={styles.title}>{t('auth.login.title')}</Text>
@@ -214,7 +221,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 30,
     paddingTop: 80,
-    paddingBottom: 40,
+    paddingBottom: 80,
   },
   header: {
     alignItems: 'center',
