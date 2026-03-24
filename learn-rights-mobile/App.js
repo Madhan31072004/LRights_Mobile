@@ -97,10 +97,13 @@ const Navigation = () => {
   const initialLang = getLanguage();
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator 
+      screenOptions={{ headerShown: false }}
+      initialRouteName={!initialLang ? "LanguageSelect" : "Welcome"}
+    >
       {!token ? (
         <>
-          {!initialLang && <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} />}
+          <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} />
           <Stack.Screen name="Welcome" component={WelcomeScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />

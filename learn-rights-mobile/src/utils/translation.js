@@ -505,8 +505,13 @@ export const loadTranslations = async (lang) => {
         }
     } catch (err) {
         console.error("Load translations error", err);
+        // Fallback to English but allow progress
+        currentLanguage = lang;
+        await AsyncStorage.setItem('language', lang);
+        listeners.forEach(l => l(lang));
+        return true;
     }
-    return false;
+    return true;
 };
 
 export const onTranslationChange = (fn) => {
