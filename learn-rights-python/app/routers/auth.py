@@ -45,42 +45,56 @@ def _user_to_response(user: dict) -> dict:
 
 @router.post("/signup")
 def signup(body: SignupBody):
-    db = get_db()
-    users = db["users"]
-    if not body.email:
-        raise HTTPException(status_code=400, detail="Email is required")
-    q = {"$or": [{"email": body.email}]}
-    if body.mobile:
-        q["$or"].append({"mobile": body.mobile})
-    if users.find_one(q):
-        raise HTTPException(status_code=400, detail="User already exists")
-    hashed = _hash_password(body.password) if body.password else None
-    doc = {
-        "name": body.name,
-        "email": body.email,
-        "password": hashed,
-        "preferredLanguage": body.preferredLanguage or "en",
-        "profilePhoto": "",
-        "completedModules": [],
-        "completedSubTopics": [],
-        "quizzes": [],
-        "points": 0,
-        "badges": [],
-        "role": "user",
-        "createdAt": datetime.utcnow(),
-    }
-    # Only include mobile if provided (avoid null values in sparse unique index)
-    if body.mobile:
-        doc["mobile"] = body.mobile
-    r = users.insert_one(doc)
-    doc["_id"] = r.inserted_id
-    payload = {"userId": str(r.inserted_id), "exp": datetime.utcnow() + timedelta(days=JWT_EXPIRE_DAYS)}
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return {
-        "message": "User signed up successfully",
-        "token": token,
-        "user": _user_to_response(doc),
-    }
+    try:
+        db = get_db()
+        users = db["users"]
+        if not body.email:
+            raise HTTPException(status_code=400, detail="Email is required")
+        
+        # Check if user already exists
+        q = {"email": body.email}
+        if users.find_one(q):
+            raise HTTPException(status_code=400, detail="User already exists with this email")
+            
+        if body.mobile:
+            if users.find_one({"mobile": body.mobile}):
+                 raise HTTPException(status_code=400, detail="User already exists with this mobile number")
+
+        hashed = _hash_password(body.password) if body.password else None
+        doc = {
+            "name": body.name,
+            "email": body.email,
+            "password": hashed,
+            "preferredLanguage": body.preferredLanguage or "en",
+            "profilePhoto": "",
+            "completedModules": [],
+            "completedSubTopics": [],
+            "quizzes": [],
+            "points": 0,
+            "badges": [],
+            "role": "user",
+            "createdAt": datetime.utcnow(),
+        }
+        # Only include mobile if provided (avoid null values in sparse unique index)
+        if body.mobile:
+            doc["mobile"] = body.mobile
+            
+        r = users.insert_one(doc)
+        doc["_id"] = r.inserted_id
+        payload = {"userId": str(r.inserted_id), "exp": datetime.utcnow() + timedelta(days=JWT_EXPIRE_DAYS)}
+        token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+        return {
+            "message": "User signed up successfully",
+            "token": token,
+            "user": _user_to_response(doc),
+        }
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        import traceback
+        print(f"CRITICAL SIGNUP ERROR: {str(e)}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Database or Server Error: {str(e)}")
 
 
 @router.post("/login")
