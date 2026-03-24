@@ -38,10 +38,10 @@ const SignupScreen = ({ navigation }) => {
     iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
-    // Ensure the redirect URI is correctly resolved for BOTH Expo Go and Production Web
+    // PRODUCTION FIX: Ensure redirect matches the Render URL exactly for web
     redirectUri: AuthSession.makeRedirectUri({
       scheme: 'learnrights',
-      preferLocalhost: true,
+      preferLocalhost: false,
     }),
   };
   
@@ -61,6 +61,9 @@ const SignupScreen = ({ navigation }) => {
           setError(`Google Signup Error: ${response.error?.message || 'Check Cloud Console Configuration'}`);
         } else if (response.type === 'dismiss') {
           setError('Google Signup was dismissed. Please try again.');
+        } else {
+          console.warn("Google Signup Unhandled Response Type:", response.type);
+          setError(`Google Signup State: ${response.type || 'unknown'}`);
         }
       }
     }
