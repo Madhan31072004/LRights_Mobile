@@ -9,10 +9,10 @@ const Welcome = () => {
   const [currentQuote, setCurrentQuote] = useState(0);
 
   const quotes = [
-    "Knowledge is power, especially when it comes to your rights.",
-    "Empower yourself with legal knowledge in your language.",
-    "Your rights matter. Learn them, understand them, exercise them.",
-    "Justice begins with awareness and education."
+    t('welcome.quote1', { defaultValue: "Knowledge is power, especially when it comes to your rights." }),
+    t('welcome.quote2', { defaultValue: "Empower yourself with legal knowledge in your language." }),
+    t('welcome.quote3', { defaultValue: "Your rights matter. Learn them, understand them, exercise them." }),
+    t('welcome.quote4', { defaultValue: "Justice begins with awareness and education." })
   ];
 
   useEffect(() => {
@@ -108,7 +108,7 @@ const Welcome = () => {
             {/* CTA Button */}
             <button
               className="welcome-cta-btn"
-              onClick={() => navigate("/language")}
+              onClick={() => navigate("/signup")}
             >
               <span className="btn-text">
                 {t('welcome.get_started', { defaultValue: 'Get Started' })}

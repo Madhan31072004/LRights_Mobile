@@ -39,5 +39,86 @@
   "admin.name": "Name",
   "admin.email": "Email",
   "admin.points": "Points",
-  "admin.reports": "Reports"
+  "admin.reports": "Reports",
+  "welcome.quote1": "Knowledge is power, especially when it comes to your rights.",
+  "welcome.quote2": "Empower yourself with knowledge, protect your future.",
+  "welcome.quote3": "Legal awareness is the first step towards justice.",
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue your journey",
+      "submit": "Login",
+      "forgot": "Forgot Password?",
+      "google": "Continue with Google",
+      "no_account": "Don't have an account?"
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Join thousands of women learning their rights",
+      "submit": "Sign Up",
+      "google": "Sign up with Google",
+      "have_account": "Already have an account?"
+    },
+    "fields": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "lang_hint": "Preferred Language (e.g. en, hi)"
+    },
+    "or": "OR",
+    "passwordMismatch": "Passwords do not match",
+    "signupSuccess": "Account created! Please log in.",
+    "fillAllFields": "Please fill in all fields",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your experience",
+    "language": "Language",
+    "select_language": "Select your preferred language:",
+    "display": "Display",
+    "font_size": "Font Size:",
+    "font_small": "Small",
+    "font_medium": "Medium",
+    "font_large": "Large",
+    "dark_mode": "Dark Mode",
+    "dark_mode_desc": "Enable dark mode for reduced eye strain",
+    "on": "ON",
+    "off": "OFF",
+    "accessibility": "Accessibility",
+    "voice_output": "Voice Output",
+    "voice_output_desc": "Enable text-to-speech for chatbot responses",
+    "notifications": "Notifications",
+    "notifications_desc": "Receive notifications about new modules and updates",
+    "data_management": "Data Management",
+    "export_data": "Export Your Data",
+    "export_desc": "Download a backup of your progress and chat history",
+    "export_btn": "Export Data",
+    "delete_data": "Delete All Data",
+    "delete_warning": "This will permanently delete all your data including progress and chat history",
+    "delete_btn": "Delete All Data",
+    "delete_confirm": "Are you sure you want to delete all your data? This cannot be undone.",
+    "information": "Information",
+    "about": {
+      "title": "About This App",
+      "desc": "Learn Rights is an AI-powered platform designed to educate women about their legal rights and provide guidance on legal matters."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "desc": "Your data is private and secure. We do not share personal information with third parties without your consent."
+    },
+    "tos": {
+      "title": "Terms of Service",
+      "desc": "By using this platform, you agree to provide accurate information and use the service responsibly."
+    },
+    "version": {
+      "title": "Version",
+      "desc": "Learn Rights v2.5 | Last Updated: March 2026"
+    },
+    "help": "Help & Support",
+    "help_desc": "For technical issues or feedback, please contact us:"
+  },
+  "welcome.quote4": "Justice begins with awareness and education."
 }

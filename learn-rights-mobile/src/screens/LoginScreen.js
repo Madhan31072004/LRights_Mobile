@@ -61,7 +61,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleSubmit = async () => {
     if (!form.email || !form.password) {
-      setError('Please fill in all fields');
+      setError(t('auth.fillAllFields', { defaultValue: 'Please fill in all fields' }));
       return;
     }
 
@@ -109,7 +109,7 @@ const LoginScreen = ({ navigation }) => {
               <Mail size={20} color="rgba(255, 255, 255, 0.5)" style={styles.icon} />
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder={t('auth.enterEmail', { defaultValue: "Enter your email" })}
                 placeholderTextColor="rgba(255, 255, 255, 0.3)"
                 value={form.email}
                 onChangeText={(val) => setForm({ ...form, email: val })}
@@ -125,7 +125,7 @@ const LoginScreen = ({ navigation }) => {
               <Lock size={20} color="rgba(255, 255, 255, 0.5)" style={styles.icon} />
               <TextInput
                 style={styles.input}
-                placeholder="Enter your password"
+                placeholder={t('auth.enterPassword', { defaultValue: "Enter your password" })}
                 placeholderTextColor="rgba(255, 255, 255, 0.3)"
                 value={form.password}
                 onChangeText={(val) => setForm({ ...form, password: val })}

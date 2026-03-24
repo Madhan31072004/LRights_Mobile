@@ -19,7 +19,7 @@ const LanguageSelect = () => {
 
     // Simulate loading for better UX
     setTimeout(() => {
-      navigate("/signup");
+      navigate("/");
     }, 800);
   };
 

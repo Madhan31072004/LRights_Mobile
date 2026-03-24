@@ -244,7 +244,7 @@ const ProfileScreen = () => {
             <TabButton id="progress" label={t('profile.tabs.progress')} icon={BarChart3} index={1} />
             <TabButton id="achievements" label={t('profile.tabs.achievements')} icon={Trophy} index={2} />
             <TabButton id="certs" label={t('profile.tabs.certs')} icon={Award} index={3} />
-            <TabButton id="safety" label="Safety" icon={ShieldAlert} index={4} />
+            <TabButton id="safety" label={t('safety.hub')} icon={ShieldAlert} index={4} />
         </View>
 
         <View style={styles.tabContent}>

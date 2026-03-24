@@ -59,7 +59,7 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async () => {
     if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t('auth.passwordMismatch', { defaultValue: 'Passwords do not match' }));
       return;
     }
     setLoading(true);
@@ -74,7 +74,7 @@ const SignupScreen = ({ navigation }) => {
       if (res.token) {
         await login(res.token);
       } else {
-        alert("Account created! Please log in.");
+        alert(t('auth.signupSuccess', { defaultValue: "Account created! Please log in." }));
         navigation.navigate('Login');
       }
     } catch (err) {
