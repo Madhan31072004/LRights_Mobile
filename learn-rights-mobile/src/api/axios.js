@@ -6,7 +6,12 @@ import { enqueueOfflineAction } from '../utils/offlineDB';
 // Make sure your phone and computer are on the same Wi-Fi!
 // Dynamically use PROD or LOCAL API URL
 const prodURL = "https://lrights-mobile-python.onrender.com/api";
-const stagingURL = "https://lrights-mobile-python.onrender.com/api"; // Default to prod if local fails
+const fallbackLocalIPs = [
+  "http://localhost:5000/api",
+  "http://127.0.0.1:5000/api",
+  "http://192.168.1.100:5000/api",
+];
+
 const baseURL = process.env.NODE_ENV === 'production' 
   ? prodURL 
   : (process.env.EXPO_PUBLIC_API_URL || "http://192.168.139.150:5000/api");
@@ -14,7 +19,7 @@ const baseURL = process.env.NODE_ENV === 'production'
 
 const instance = axios.create({
   baseURL,
-  timeout: 60000, 
+  timeout: 15000,
   headers: {
       "Bypass-Tunnel-Reminder": "true"
   }
@@ -35,7 +40,33 @@ instance.interceptors.request.use(async (config) => {
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const config = error.config;
+    const { config, response } = error;
+    
+    // 1. Logic for Retries (Max 2 retries for GET requests)
+    const isRetryable = config && config.method === 'get' && (!config.__retryCount || config.__retryCount < 2);
+    
+    if (isRetryable) {
+      config.__retryCount = (config.__retryCount || 0) + 1;
+      console.log(`[Axios] Retrying ${config.url} (${config.__retryCount}/2)...`);
+      return instance(config);
+    }
+
+    // 2. Local Fallback Logic (Only in Development)
+    if (process.env.NODE_ENV !== 'production' && (error.code === 'ERR_NETWORK' || !response)) {
+        for (const url of fallbackLocalIPs) {
+            if (config.baseURL !== url) {
+                console.warn(`[Axios] Production connection failed, trying local: ${url}`);
+                const newConfig = { ...config, baseURL: url };
+                try {
+                    return await axios(newConfig);
+                } catch (e) {
+                    console.log(`[Axios] ${url} fallback failed.`);
+                }
+            }
+        }
+    }
+
+    // Original error handling logic
     
     // Check if network error or timeout
     const isNetworkError = !error.response || error.code === 'ECONNABORTED' || error.message === 'Network Error';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions, Animated as RNAnimated, Platform, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable, Dimensions, Animated as RNAnimated, Platform, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInDown, ZoomIn, useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming, interpolate, Extrapolate, runOnJS } from 'react-native-reanimated';
 import { ShieldCheck, ArrowRight, Bot, Scale, ShieldAlert, Sparkles, Globe } from 'lucide-react-native';
@@ -139,18 +139,24 @@ const WelcomeScreen = ({ navigation }) => {
               </View>
   
               <Animated.View entering={FadeInDown.delay(400)} style={styles.buttonRow}>
-                  <TouchableOpacity style={styles.primaryBtn} onPress={nextSlide}>
+                  <Pressable 
+                      style={({ pressed }) => [styles.primaryBtn, pressed && { opacity: 0.8 }]} 
+                      onPress={nextSlide}
+                  >
                       <LinearGradient colors={['#7c3aed', '#5b21b6']} style={styles.btnInner}>
                           <Text style={styles.btnText}>
                               {activeSlide === SLIDES.length - 1 ? t('welcome.get_started') : t('game.next')}
                           </Text>
                           <ArrowRight size={20} color="white" />
                       </LinearGradient>
-                  </TouchableOpacity>
+                  </Pressable>
   
-                  <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('Login')}>
+                  <Pressable 
+                      style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.7 }]} 
+                      onPress={() => navigation.navigate('Login')}
+                  >
                       <Text style={styles.secondaryText}>{t('welcome.login')}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
               </Animated.View>
   
               <View style={styles.statsContainer}>

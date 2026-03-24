@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { User, Mail, Lock, ShieldCheck, ChevronRight, Languages } from 'lucide-react-native';
 import { signupUser } from "../services/authService";
@@ -162,14 +162,18 @@ const SignupScreen = ({ navigation }) => {
               <TextInput style={styles.input} placeholder={t('auth.fields.lang_hint')} placeholderTextColor="rgba(255,255,255,0.3)" value={form.preferredLanguage} onChangeText={v => setForm({...form, preferredLanguage: v})} />
            </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleSignup} disabled={loading}>
+            <Pressable 
+                style={({ pressed }) => [styles.button, pressed && { opacity: 0.9 }]} 
+                onPress={handleSignup} 
+                disabled={loading}
+            >
                {loading ? <ActivityIndicator color="white" /> : (
                  <>
                    <Text style={styles.buttonText}>{t('auth.signup.submit')}</Text>
                    <ChevronRight size={20} color="white" />
                  </>
                )}
-            </TouchableOpacity>
+            </Pressable>
 
             <View style={styles.divider}>
               <View style={styles.line} />
@@ -177,8 +181,8 @@ const SignupScreen = ({ navigation }) => {
               <View style={styles.line} />
             </View>
 
-            <TouchableOpacity 
-              style={styles.googleBtn} 
+            <Pressable 
+              style={({ pressed }) => [styles.googleBtn, pressed && { backgroundColor: '#f9fafb' }]} 
               onPress={() => promptAsync()}
               disabled={!request || loading}
             >
@@ -191,14 +195,14 @@ const SignupScreen = ({ navigation }) => {
                 </View>
               </View>
               <Text style={styles.googleBtnText}>{t('auth.signup.google')}</Text>
-            </TouchableOpacity>
+            </Pressable>
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>{t('auth.signup.have_account')} </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Pressable onPress={() => navigation.navigate('Login')}>
             <Text style={styles.footerLink}>{t('login')}</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

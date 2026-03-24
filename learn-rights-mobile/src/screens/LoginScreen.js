@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TextInput, Pressable, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Mail, Lock, Eye, EyeOff, LogIn, ShieldCheck } from 'lucide-react-native';
@@ -159,18 +159,18 @@ const LoginScreen = ({ navigation }) => {
                 onChangeText={(val) => setForm({ ...form, password: val })}
                 secureTextEntry={!showPwd}
               />
-              <TouchableOpacity onPress={() => setShowPwd(!showPwd)}>
+              <Pressable onPress={() => setShowPwd(!showPwd)}>
                 {showPwd ? <EyeOff size={20} color="rgba(255, 255, 255, 0.5)" /> : <Eye size={20} color="rgba(255, 255, 255, 0.5)" />}
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
-          <TouchableOpacity style={styles.forgotBtn}>
+          <Pressable style={({ pressed }) => [styles.forgotBtn, pressed && { opacity: 0.7 }]}>
             <Text style={styles.forgotText}>{t('auth.login.forgot')}</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity 
-            style={styles.submitBtn} 
+          <Pressable 
+            style={({ pressed }) => [styles.submitBtn, pressed && { opacity: 0.9 }]} 
             onPress={handleSubmit}
             disabled={loading}
           >
@@ -189,7 +189,7 @@ const LoginScreen = ({ navigation }) => {
                 </>
               )}
             </LinearGradient>
-          </TouchableOpacity>
+          </Pressable>
 
           <View style={styles.divider}>
             <View style={styles.line} />
@@ -197,8 +197,8 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.line} />
           </View>
 
-          <TouchableOpacity 
-            style={styles.googleBtn} 
+          <Pressable 
+            style={({ pressed }) => [styles.googleBtn, pressed && { backgroundColor: '#f9fafb' }]} 
             onPress={() => promptAsync()}
             disabled={!request || loading}
           >
@@ -211,13 +211,13 @@ const LoginScreen = ({ navigation }) => {
               </View>
             </View>
             <Text style={styles.googleBtnText}>{t('auth.login.google')}</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.login.no_account')} </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Pressable onPress={() => navigation.navigate('Signup')}>
               <Text style={styles.signupText}>{t('auth.signup.title')}</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>

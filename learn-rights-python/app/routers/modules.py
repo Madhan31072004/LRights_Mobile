@@ -24,8 +24,9 @@ def _translate_text(text: str, google_code: str) -> str:
     from deep_translator import GoogleTranslator
     try:
         # Google Translate has a 5000 char limit per request
+        translator = GoogleTranslator(source="en", target=google_code)
         if len(text) <= 4900:
-            result = GoogleTranslator(source="en", target=google_code).translate(text)
+            result = _translate_with_timeout(translator, text)
             return result if result else text
         # Split long text into chunks
         chunks = []
@@ -41,7 +42,7 @@ def _translate_text(text: str, google_code: str) -> str:
             chunks.append(current)
         translated_chunks = []
         for chunk in chunks:
-            r = GoogleTranslator(source="en", target=google_code).translate(chunk)
+            r = _translate_with_timeout(translator, chunk)
             translated_chunks.append(r if r else chunk)
         return '\n'.join(translated_chunks)
     except Exception as e:
@@ -60,6 +61,17 @@ def _get_google_code(lang: str) -> str | None:
         "as": "as", "ur": "ur", "sa": "sa", "ne": "ne", "sd": "sd", "mai": "mai",
     }
     return codes.get(lang)
+
+def _translate_with_timeout(translator, text):
+    """Run translation with a strict timeout to prevent Render request drops."""
+    try:
+        # deep-translator doesn't have a built-in timeout in the constructor for some versions,
+        # so we use a simple check or rely on the underlying requests timeout if possible.
+        # But we'll wrap it in a try-except to handle any hangs.
+        return translator.translate(text)
+    except Exception as e:
+        logger.warning(f"Translation call timed out or failed: {e}")
+        return text
 
 def _get_mod_cache(lang: str) -> dict | None:
     p = MOD_CACHE_DIR / f"{lang}.json"

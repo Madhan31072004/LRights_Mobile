@@ -130,6 +130,7 @@ export const UserProvider = ({ children }) => {
     } catch (err) {
       console.error('Refresh error:', err);
       setHasConnectionError(true);
+      setLoading(false); // Ensure loading is cleared on refresh failure too
     }
   };
 
