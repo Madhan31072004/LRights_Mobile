@@ -32,17 +32,15 @@ const SignupScreen = ({ navigation }) => {
     }
   }, [language]);
 
-  // Google Auth Hook - Using separate IDs for Android/iOS/Web
+  // Google Auth Hook - Optimized for platform-specific redirects
   const googleConfig = {
     androidClientId: "1034415973183-piv5n8eqma8jdf394g95uv0s5fhpp6di.apps.googleusercontent.com",
     iosClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     webClientId: "1034415973183-pg06ng2b0b7ta1ta48kiphk8bpnq2muk.apps.googleusercontent.com",
     scopes: ['profile', 'email'],
-    // PRODUCTION FIX: Ensure redirect matches the Render URL exactly for web
-    redirectUri: AuthSession.makeRedirectUri({
-      scheme: 'learnrights',
-      preferLocalhost: false,
-    }),
+    // FIX: Only specify redirectUri for the Web version (Render).
+    // Standalone APKs will use the registered scheme 'learnrights://' automatically.
+    ...(Platform.OS === 'web' && { redirectUri: 'https://lrights-mobile.onrender.com' })
   };
   
   const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
