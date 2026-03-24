@@ -41,7 +41,7 @@ export const googleLoginUser = async (accessToken) => {
     return response.data; // { message, token, user }
   } catch (error) {
     const resData = error.response?.data;
-    let msg = "Google login failed";
+    let msg = "Google authentication failed";
     if (resData) {
       if (typeof resData.message === "string") msg = resData.message;
       else if (Array.isArray(resData.detail)) msg = resData.detail[0]?.msg || resData.detail[0]?.loc?.join?.(" ") || msg;
