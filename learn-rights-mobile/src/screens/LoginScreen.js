@@ -32,9 +32,11 @@ const LoginScreen = ({ navigation }) => {
   const [request, response, promptAsync] = Google.useAuthRequest(googleConfig);
 
   useEffect(() => {
+    console.log("Google Login Response Type:", response?.type);
     if (response) {
       if (response.type === 'success') {
         const { authentication } = response;
+        console.log("Google Login Success, token obtained.");
         handleGoogleLogin(authentication.accessToken);
       } else if (response.type === 'error' || response.type === 'cancel') {
         console.warn('Google Login Response:', response);
