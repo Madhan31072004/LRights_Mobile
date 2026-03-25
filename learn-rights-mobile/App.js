@@ -105,19 +105,7 @@ if (Platform.OS === 'web') {
       height: 100% !important;
       overscroll-behavior: contain;
     }
-    /* Implementation of the 'Inert' suggestion for web accessibility */
-    [aria-hidden="true"] {
-      pointer-events: none !important;
-      user-select: none !important;
-      touch-action: none !important;
-    }
-    [aria-hidden="true"] * {
-      pointer-events: none !important;
-    }
-    /* Ensure the active screen is always interactive */
-    [aria-hidden="false"], :not([aria-hidden]) {
-      pointer-events: auto !important;
-    }
+    /* Pointer event restrictions removed to fix TextInput interaction issues on web */
   `;
   document.head.append(style);
 
