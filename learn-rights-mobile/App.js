@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Home, BookOpen, MessageSquare, Trophy, User, ShieldCheck, Users } from 'lucide-react-native';
 import { enableScreens } from 'react-native-screens';
+import * as Linking from 'expo-linking';
 
 if (Platform.OS === 'web') {
   enableScreens(false);
@@ -136,47 +137,60 @@ const Navigation = () => {
 
   const initialLang = getLanguage();
 
+  const linking = {
+    prefixes: [Linking.createURL('/')],
+    config: {
+      screens: {
+        Login: 'login',
+        Signup: 'signup',
+        Welcome: 'welcome',
+      },
+    },
+  };
+
   return (
-    <Stack.Navigator 
-      screenOptions={{ headerShown: false }}
-      initialRouteName={token ? "Main" : (!initialLang ? "LanguageSelect" : "Welcome")}
-    >
-      {!token ? (
-        <>
-          <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} />
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Signup" component={SignupScreen} />
-          <Stack.Screen name="LanguageSelect_Manual" component={LanguageSelectScreen} />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="Main" component={MainTabs} />
-          <Stack.Screen name="Bot" component={ChatbotScreen} />
-          <Stack.Screen name="Stories" component={StoriesScreen} />
-          <Stack.Screen name="Competition" component={CompetitionScreen} />
-          <Stack.Screen name="Quiz" component={QuizScreen} />
-          <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
-          <Stack.Screen name="AdminCommunity" component={AdminCommunityScreen} />
-          <Stack.Screen name="AdminEntries" component={AdminEntriesScreen} />
-          <Stack.Screen name="AdminGames" component={AdminGamesScreen} />
-          <Stack.Screen name="LawyersDirectory" component={LawyersDirectoryScreen} />
-          <Stack.Screen name="LawyerProfileForm" component={LawyerProfileFormScreen} />
-          <Stack.Screen name="AdminLawyers" component={AdminLawyersScreen} />
-          <Stack.Screen name="AdminModules" component={AdminModulesScreen} />
-          <Stack.Screen name="AdminBotSettings" component={AdminBotSettingsScreen} />
-        <Stack.Screen name="AdminSafety" component={AdminSafetyScreen} />
-          <Stack.Screen name="GameCenter" component={GameCenterScreen} />
-          <Stack.Screen name="RightsMatch" component={RightsMatchScreen} />
-          <Stack.Screen name="ScenarioGame" component={ScenarioGameScreen} />
-          <Stack.Screen name="LightningQuiz" component={LightningQuizScreen} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} />
-          <Stack.Screen name="SafetyHub" component={SafetyHubScreen} />
-      <Stack.Screen name="FakeCall" component={FakeCallScreen} options={{ presentation: 'fullScreenModal' }} />
-      <Stack.Screen name="WeeklyChallenge" component={WeeklyChallengeScreen} />
-        </>
-      )}
-    </Stack.Navigator>
+    <NavigationContainer linking={linking}>
+      <Stack.Navigator 
+        screenOptions={{ headerShown: false }}
+        initialRouteName={token ? "Main" : (!initialLang ? "LanguageSelect" : "Welcome")}
+      >
+        {!token ? (
+          <>
+            <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} />
+            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
+            <Stack.Screen name="LanguageSelect_Manual" component={LanguageSelectScreen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Main" component={MainTabs} />
+            <Stack.Screen name="Bot" component={ChatbotScreen} />
+            <Stack.Screen name="Stories" component={StoriesScreen} />
+            <Stack.Screen name="Competition" component={CompetitionScreen} />
+            <Stack.Screen name="Quiz" component={QuizScreen} />
+            <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+            <Stack.Screen name="AdminCommunity" component={AdminCommunityScreen} />
+            <Stack.Screen name="AdminEntries" component={AdminEntriesScreen} />
+            <Stack.Screen name="AdminGames" component={AdminGamesScreen} />
+            <Stack.Screen name="LawyersDirectory" component={LawyersDirectoryScreen} />
+            <Stack.Screen name="LawyerProfileForm" component={LawyerProfileFormScreen} />
+            <Stack.Screen name="AdminLawyers" component={AdminLawyersScreen} />
+            <Stack.Screen name="AdminModules" component={AdminModulesScreen} />
+            <Stack.Screen name="AdminBotSettings" component={AdminBotSettingsScreen} />
+            <Stack.Screen name="AdminSafety" component={AdminSafetyScreen} />
+            <Stack.Screen name="GameCenter" component={GameCenterScreen} />
+            <Stack.Screen name="RightsMatch" component={RightsMatchScreen} />
+            <Stack.Screen name="ScenarioGame" component={ScenarioGameScreen} />
+            <Stack.Screen name="LightningQuiz" component={LightningQuizScreen} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} />
+            <Stack.Screen name="SafetyHub" component={SafetyHubScreen} />
+            <Stack.Screen name="FakeCall" component={FakeCallScreen} options={{ presentation: 'fullScreenModal' }} />
+            <Stack.Screen name="WeeklyChallenge" component={WeeklyChallengeScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
