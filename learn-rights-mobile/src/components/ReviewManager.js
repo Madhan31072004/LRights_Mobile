@@ -24,7 +24,10 @@ const ReviewManager = () => {
     }, []);
 
     useEffect(() => {
-        if (!token || !userId || hasReviewed) {
+        // Skip if already reviewed (either via flag or user data from context)
+        const hasExistingReview = user?.appReview?.rating > 0;
+        
+        if (!token || !userId || hasReviewed || hasExistingReview) {
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;

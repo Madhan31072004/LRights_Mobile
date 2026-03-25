@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'; // Refined Onboarding & SOS
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, Image, RefreshControl, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInRight, ZoomIn, FadeInDown } from 'react-native-reanimated';
-import { BookOpen, Bot, Trophy, LogOut, Users, Languages, Star, ChevronRight, Play, Award, User, Zap, RefreshCcw, AlertCircle, ShieldCheck, ArrowRight, Compass, Flame, Gamepad2, Bell, ShieldAlert, Gavel, CheckCircle2 } from 'lucide-react-native';
+import { BookOpen, Bot, Trophy, LogOut, Users, Languages, Star, ChevronRight, Play, Award, User, Zap, RefreshCcw, AlertCircle, ShieldCheck, ArrowRight, Compass, Flame, Gamepad2, Bell, ShieldAlert, Gavel, CheckCircle2, Pencil } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
@@ -10,6 +10,7 @@ import { useSafety } from '../contexts/SafetyModeContext';
 import { t } from '../utils/translation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal, Pressable } from 'react-native';
+import ReviewModal from '../components/ReviewModal';
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,6 +36,8 @@ const HomeScreen = () => {
   const [checkedInToday, setCheckedInToday] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [tourStep, setTourStep] = useState(0);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [publicReviews, setPublicReviews] = useState([]);
 
   useEffect(() => {
     const checkTour = async () => {
@@ -96,13 +99,15 @@ const HomeScreen = () => {
   const fetchStats = async () => {
     if (!userId) return;
     try {
-        const [statsRes, lbRes, streakRes] = await Promise.all([
+        const [statsRes, lbRes, streakRes, reviewRes] = await Promise.all([
           API.get("/admin/public-stats"),
           API.get("/leaderboard/top"),
-          API.get(`/games/streak/${userId}`)
+          API.get(`/games/streak/${userId}`),
+          API.get("/reviews")
         ]);
         setPublicStats(statsRes.data);
         setStreak(streakRes.data.streak || 0);
+        setPublicReviews(reviewRes.data || []);
         
         // Find user rank
         const rank = lbRes.data.findIndex(u => u._id === userId);
@@ -506,6 +511,122 @@ const HomeScreen = () => {
                 )}
             </View>
         </View>
+        
+        {/* Community Feedback Section */}
+        <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+                <MessageSquareHeart size={22} color="#a855f7" />
+                <Text style={styles.sectionTitle}>{t('home.community_feedback', { defaultValue: 'Community Feedback' })}</Text>
+                <TouchableOpacity 
+                    style={styles.editReviewBtn} 
+                    onPress={() => setShowReviewModal(true)}
+                >
+                    <Pencil size={16} color="#a855f7" />
+                    <Text style={styles.editReviewText}>{user?.appReview ? t('edit', { defaultValue: 'Edit Your Review' }) : t('share_feedback', { defaultValue: 'Share Your Experience' })}</Text>
+                </TouchableOpacity>
+            </View>
+            
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizScroll}>
+                {/* My Review First if it exists */}
+                {user?.appReview && (
+                    <TouchableOpacity 
+                        style={[styles.reviewCard, styles.myReviewCard]} 
+                        onPress={() => setShowReviewModal(true)}
+                        activeOpacity={0.8}
+                    >
+                        <LinearGradient 
+                            colors={['rgba(168, 85, 247, 0.15)', 'rgba(168, 85, 247, 0.05)']} 
+                            style={styles.reviewInner}
+                        >
+                            <View style={styles.reviewHeader}>
+                                <View style={styles.userInfo}>
+                                    <View style={[styles.avatar, { backgroundColor: '#a855f7' }]}>
+                                        <Text style={styles.avatarText}>{user.name?.[0]?.toUpperCase() || 'U'}</Text>
+                                    </View>
+                                    <View>
+                                        <Text style={styles.reviewerName}>{t('home.your_review', { defaultValue: 'Your Review' })}</Text>
+                                        <Text style={styles.reviewTime}>{t('home.just_now', { defaultValue: 'Recently updated' })}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.reviewStars}>
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <Star 
+                                        key={i} 
+                                        size={14} 
+                                        color={i <= user.appReview.rating ? '#FFD700' : 'rgba(255,255,255,0.1)'} 
+                                        fill={i <= user.appReview.rating ? '#FFD700' : 'transparent'} 
+                                    />
+                                ))}
+                            </View>
+                            <Text style={styles.reviewFeedback} numberOfLines={3}>
+                                {user.appReview.feedback || t('home.no_feedback')}
+                            </Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                )}
+
+                {/* Other Users' Reviews */}
+                {publicReviews
+                    .filter(r => r.userName !== user?.name) // Don't duplicate my review
+                    .map((rev, i) => (
+                    <View key={i} style={styles.reviewCard}>
+                        <LinearGradient 
+                            colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']} 
+                            style={styles.reviewInner}
+                        >
+                            <View style={styles.reviewHeader}>
+                                <View style={styles.userInfo}>
+                                    {rev.profilePhoto ? (
+                                        <Image source={{ uri: `http://192.168.139.150:5000${rev.profilePhoto}` }} style={styles.avatar} />
+                                    ) : (
+                                        <View style={[styles.avatar, { backgroundColor: 'rgba(255,255,255,0.1)' }]}>
+                                            <Text style={styles.avatarText}>{rev.userName?.[0]?.toUpperCase() || '?'}</Text>
+                                        </View>
+                                    )}
+                                    <View>
+                                        <Text style={styles.reviewerName}>{rev.userName}</Text>
+                                        <Text style={styles.reviewTime}>{new Date(rev.createdAt).toLocaleDateString()}</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={styles.reviewStars}>
+                                {[1, 2, 3, 4, 5].map(i => (
+                                    <Star 
+                                        key={i} 
+                                        size={14} 
+                                        color={i <= rev.rating ? '#FFD700' : 'rgba(255,255,255,0.1)'} 
+                                        fill={i <= rev.rating ? '#FFD700' : 'transparent'} 
+                                    />
+                                ))}
+                            </View>
+                            <Text style={styles.reviewFeedback} numberOfLines={3}>
+                                {rev.feedback || "Loved using the app!"}
+                            </Text>
+                        </LinearGradient>
+                    </View>
+                ))}
+
+                {(!publicReviews.length && !user?.appReview) && (
+                    <TouchableOpacity style={styles.emptyReviewPrompt} onPress={() => setShowReviewModal(true)}>
+                         <Star size={30} color="rgba(168, 85, 247, 0.2)" />
+                         <Text style={styles.emptyReviewPromptText}>{t('home.be_the_first', { defaultValue: 'Be the first to leave a review!' })}</Text>
+                    </TouchableOpacity>
+                )}
+            </ScrollView>
+        </View>
+
+        <ReviewModal 
+            visible={showReviewModal} 
+            onClose={() => {
+                setShowReviewModal(false);
+                refreshUserData();
+                fetchStats(); // Update public reviews list
+            }} 
+            userId={userId}
+            initialRating={user?.appReview?.rating || 0}
+            initialFeedback={user?.appReview?.feedback || ''}
+        />
 
         {/* Why Choose Learn Rights Features Section */}
         <View style={styles.section}>
@@ -922,7 +1043,23 @@ const styles = StyleSheet.create({
   tourDesc: { color: 'rgba(255,255,255,0.7)', fontSize: 15, textAlign: 'center', lineHeight: 24, marginBottom: 20 },
   tourBtn: { height: 55, borderRadius: 15, overflow: 'hidden', marginTop: 10 },
   tourBtnGradient: { flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 },
-  tourBtnText: { color: 'white', fontSize: 16, fontWeight: '800' }
+  tourBtnText: { color: 'white', fontSize: 16, fontWeight: '800' },
+  // Review Section Styles
+  editReviewBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(124, 58, 237, 0.1)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10 },
+  editReviewText: { color: '#7c3aed', fontSize: 12, fontWeight: '700' },
+  reviewCard: { width: 280, borderRadius: 25, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)', marginRight: 15 },
+  myReviewCard: { borderColor: 'rgba(168, 85, 247, 0.3)' },
+  reviewInner: { padding: 20, flex: 1 },
+  reviewHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
+  userInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  avatar: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  avatarText: { color: 'white', fontSize: 16, fontWeight: '800' },
+  reviewerName: { color: 'white', fontSize: 14, fontWeight: '700' },
+  reviewTime: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '600' },
+  reviewStars: { flexDirection: 'row', gap: 4, marginBottom: 12 },
+  reviewFeedback: { color: 'rgba(255,255,255,0.7)', fontSize: 13, lineHeight: 18, fontWeight: '500' },
+  emptyReviewPrompt: { width: 280, height: 150, backgroundColor: 'rgba(255,255,255,0.02)', borderRadius: 25, borderStyle: 'dashed', borderWidth: 1, borderColor: 'rgba(168, 85, 247, 0.2)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  emptyReviewPromptText: { color: 'rgba(255,255,255,0.3)', fontSize: 13, marginTop: 10, textAlign: 'center' }
 });
 
 export default HomeScreen;

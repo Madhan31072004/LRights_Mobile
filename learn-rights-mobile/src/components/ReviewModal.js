@@ -25,11 +25,18 @@ import Animated, {
 } from 'react-native-reanimated';
 import API from '../api/axios';
 
-const ReviewModal = ({ visible, onClose, userId }) => {
-    const [rating, setRating] = useState(0);
-    const [feedback, setFeedback] = useState('');
+const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedback = '' }) => {
+    const [rating, setRating] = useState(initialRating);
+    const [feedback, setFeedback] = useState(initialFeedback);
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    React.useEffect(() => {
+        if (visible) {
+            setRating(initialRating);
+            setFeedback(initialFeedback);
+        }
+    }, [visible, initialRating, initialFeedback]);
 
     const handleSubmit = async () => {
         if (rating === 0) return;

@@ -44,3 +44,24 @@ def submit_review(userId: str, body: ReviewCreateBody):
         "message": "Review submitted successfully",
         "review": _serialize_mongo(review_data)
     }
+
+@router.get("/")
+def get_public_reviews():
+    db = get_db()
+    # Find users who have an appReview, project only the review and user name
+    users_with_reviews = db["users"].find(
+        {"appReview": {"$exists": True}},
+        {"name": 1, "appReview": 1, "profilePhoto": 1}
+    ).sort("appReview.createdAt", -1).limit(10)
+    
+    reviews = []
+    for u in users_with_reviews:
+        reviews.append({
+            "userName": u.get("name", "Anonymous"),
+            "profilePhoto": u.get("profilePhoto"),
+            "rating": u["appReview"].get("rating"),
+            "feedback": u["appReview"].get("feedback"),
+            "createdAt": u["appReview"].get("createdAt")
+        })
+    
+    return _serialize_mongo(reviews)
