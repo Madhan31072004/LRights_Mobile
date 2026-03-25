@@ -87,18 +87,19 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
 
     if (!visible && !submitted) return null;
 
+    // Custom component to handle Modal vs View differences between Native and Web
+    const ModalComponent = Platform.OS === 'web' ? View : Modal;
+    const modalProps = Platform.OS === 'web' 
+        ? { style: [StyleSheet.absoluteFill, { zIndex: 9999, display: visible || submitted ? 'flex' : 'none' }] }
+        : { visible: visible || submitted, transparent: true, animationType: 'none', onRequestClose: onClose };
+
     return (
-        <Modal
-            visible={visible || submitted}
-            transparent={true}
-            animationType="none"
-            onRequestClose={onClose}
-        >
+        <ModalComponent {...modalProps}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.overlay}>
+                <View style={styles.overlay} pointerEvents="auto">
                     <Animated.View 
-                        entering={ZoomIn.duration(400)} 
-                        exiting={ZoomOut.duration(300)}
+                        entering={Platform.OS === 'web' ? FadeIn : ZoomIn.duration(400)} 
+                        exiting={Platform.OS === 'web' ? FadeOut : ZoomOut.duration(300)}
                         style={styles.container}
                     >
                         <LinearGradient 
@@ -115,66 +116,70 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
                                 <X size={20} color="rgba(255,255,255,0.4)" />
                             </TouchableOpacity>
                         </View>
-
-                        {submitted ? (
-                            <Animated.View entering={FadeIn} style={styles.successContent}>
-                                <Star size={64} color="#FFD700" fill="#FFD700" />
-                                <Text style={styles.successTitle}>Thank You!</Text>
-                                <Text style={styles.successText}>Your review helps us improve LearnRights for everyone.</Text>
-                            </Animated.View>
-                        ) : (
-                            <KeyboardAvoidingView 
-                                behavior={Platform.OS === 'ios' ? 'padding' : (Platform.OS === 'android' ? 'height' : undefined)}
-                                style={styles.formContent}
-                                keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-                            >
-                                <Text style={styles.questionText}>How are you finding the app so far?</Text>
-                                
-                                <View style={styles.starsContainer}>
-                                    {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} index={i} />)}
-                                </View>
-
-                                <View style={styles.inputContainer}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Write your experience..."
-                                        placeholderTextColor="rgba(255,255,255,0.4)"
-                                        multiline
-                                        numberOfLines={4}
-                                        value={feedback}
-                                        onChangeText={setFeedback}
-                                        blurOnSubmit={false}
-                                        autoFocus={true}
-                                        selectable={true}
-                                        selectionColor="#a855f7"
-                                        cursorColor="#a855f7"
-                                    />
-                                </View>
-
-                                <TouchableOpacity 
-                                    style={[styles.submitBtn, rating === 0 && styles.disabledBtn]} 
-                                    onPress={handleSubmit}
-                                    disabled={rating === 0 || loading}
+                        
+                        <View pointerEvents="auto">
+                            {submitted ? (
+                                <Animated.View entering={FadeIn} style={styles.successContent}>
+                                    <Star size={64} color="#FFD700" fill="#FFD700" />
+                                    <Text style={styles.successTitle}>Thank You!</Text>
+                                    <Text style={styles.successText}>Your review helps us improve LearnRights for everyone.</Text>
+                                </Animated.View>
+                            ) : (
+                                <KeyboardAvoidingView 
+                                    behavior={Platform.OS === 'ios' ? 'padding' : (Platform.OS === 'android' ? 'height' : undefined)}
+                                    style={styles.formContent}
+                                    keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+                                    pointerEvents="auto"
                                 >
-                                    {loading ? (
-                                        <ActivityIndicator color="white" />
-                                    ) : (
-                                        <>
-                                            <Text style={styles.submitBtnText}>Submit Review</Text>
-                                            <Send size={18} color="white" style={{ marginLeft: 8 }} />
-                                        </>
-                                    )}
-                                </TouchableOpacity>
-                                
-                                <TouchableOpacity onPress={onClose} style={styles.maybeLaterBtn}>
-                                    <Text style={styles.maybeLaterText}>Maybe Later</Text>
-                                </TouchableOpacity>
-                            </KeyboardAvoidingView>
-                        )}
+                                    <Text style={styles.questionText}>How are you finding the app so far?</Text>
+                                    
+                                    <View style={styles.starsContainer}>
+                                        {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} index={i} />)}
+                                    </View>
+
+                                    <View style={styles.inputContainer} pointerEvents="auto">
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="Write your experience..."
+                                            placeholderTextColor="rgba(255,255,255,0.4)"
+                                            multiline
+                                            numberOfLines={4}
+                                            value={feedback}
+                                            onChangeText={setFeedback}
+                                            blurOnSubmit={false}
+                                            autoFocus={true}
+                                            selectable={true}
+                                            selectionColor="#a855f7"
+                                            cursorColor="#a855f7"
+                                            editable={true}
+                                        />
+                                    </View>
+
+                                    <TouchableOpacity 
+                                        style={[styles.submitBtn, rating === 0 && styles.disabledBtn]} 
+                                        onPress={handleSubmit}
+                                        disabled={rating === 0 || loading}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="white" />
+                                        ) : (
+                                            <>
+                                                <Text style={styles.submitBtnText}>Submit Review</Text>
+                                                <Send size={18} color="white" style={{ marginLeft: 8 }} />
+                                            </>
+                                        )}
+                                    </TouchableOpacity>
+                                    
+                                    <TouchableOpacity onPress={onClose} style={styles.maybeLaterBtn}>
+                                        <Text style={styles.maybeLaterText}>Maybe Later</Text>
+                                    </TouchableOpacity>
+                                </KeyboardAvoidingView>
+                            )}
+                        </View>
                     </Animated.View>
                 </View>
             </TouchableWithoutFeedback>
-        </Modal>
+        </ModalComponent>
     );
 };
 
