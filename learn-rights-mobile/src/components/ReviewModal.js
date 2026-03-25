@@ -98,90 +98,92 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
 
     return (
         <ModalComponent {...modalProps}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.overlay} pointerEvents="auto">
-                    <Animated.View 
-                        entering={Platform.OS === 'web' ? FadeIn : ZoomIn.duration(400)} 
-                        exiting={Platform.OS === 'web' ? FadeOut : ZoomOut.duration(300)}
-                        style={styles.container}
-                    >
-                        <LinearGradient 
-                            colors={['#2c1a4d', '#1a0b2e']} 
-                            style={styles.gradient} 
-                        />
-                        
-                        <View style={styles.header}>
-                            <View style={styles.titleRow}>
-                                <MessageSquareHeart size={24} color="#a855f7" />
-                                <Text style={styles.titleText}>Share Your Feedback</Text>
-                            </View>
-                            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                                <X size={20} color="rgba(255,255,255,0.4)" />
-                            </TouchableOpacity>
+            <View style={styles.overlay} pointerEvents="box-none">
+                <TouchableWithoutFeedback onPress={onClose}>
+                    <View style={StyleSheet.absoluteFill} />
+                </TouchableWithoutFeedback>
+                
+                <Animated.View 
+                    entering={Platform.OS === 'web' ? FadeIn : ZoomIn.duration(400)} 
+                    exiting={Platform.OS === 'web' ? FadeOut : ZoomOut.duration(300)}
+                    style={styles.container}
+                >
+                    <LinearGradient 
+                        colors={['#2c1a4d', '#1a0b2e']} 
+                        style={styles.gradient} 
+                    />
+                    
+                    <View style={styles.header}>
+                        <View style={styles.titleRow}>
+                            <MessageSquareHeart size={24} color="#a855f7" />
+                            <Text style={styles.titleText}>Share Your Feedback</Text>
                         </View>
-                        
-                        <View pointerEvents="auto">
-                            {submitted ? (
-                                <Animated.View entering={FadeIn} style={styles.successContent}>
-                                    <Star size={64} color="#FFD700" fill="#FFD700" />
-                                    <Text style={styles.successTitle}>Thank You!</Text>
-                                    <Text style={styles.successText}>Your review helps us improve LearnRights for everyone.</Text>
-                                </Animated.View>
-                            ) : (
-                                <KeyboardAvoidingView 
-                                    behavior={Platform.OS === 'ios' ? 'padding' : (Platform.OS === 'android' ? 'height' : undefined)}
-                                    style={styles.formContent}
-                                    keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
-                                    pointerEvents="auto"
+                        <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+                            <X size={20} color="rgba(255,255,255,0.4)" />
+                        </TouchableOpacity>
+                    </View>
+                    
+                    <View pointerEvents="auto">
+                        {submitted ? (
+                            <Animated.View entering={FadeIn} style={styles.successContent}>
+                                <Star size={64} color="#FFD700" fill="#FFD700" />
+                                <Text style={styles.successTitle}>Thank You!</Text>
+                                <Text style={styles.successText}>Your review helps us improve LearnRights for everyone.</Text>
+                            </Animated.View>
+                        ) : (
+                            <KeyboardAvoidingView 
+                                behavior={Platform.OS === 'ios' ? 'padding' : (Platform.OS === 'android' ? 'height' : undefined)}
+                                style={styles.formContent}
+                                keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+                            >
+                                <Text style={styles.questionText}>How are you finding the app so far?</Text>
+                                
+                                <View style={styles.starsContainer}>
+                                    {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} index={i} />)}
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Write your experience..."
+                                        placeholderTextColor="rgba(255,255,255,0.4)"
+                                        multiline
+                                        numberOfLines={4}
+                                        value={feedback}
+                                        onChangeText={setFeedback}
+                                        blurOnSubmit={false}
+                                        autoFocus={visible}
+                                        selectable={true}
+                                        selectionColor="#a855f7"
+                                        cursorColor="#a855f7"
+                                        editable={true}
+                                        textAlign="left"
+                                    />
+                                </View>
+
+                                <TouchableOpacity 
+                                    style={[styles.submitBtn, rating === 0 && styles.disabledBtn]} 
+                                    onPress={handleSubmit}
+                                    disabled={rating === 0 || loading}
                                 >
-                                    <Text style={styles.questionText}>How are you finding the app so far?</Text>
-                                    
-                                    <View style={styles.starsContainer}>
-                                        {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} index={i} />)}
-                                    </View>
-
-                                    <View style={styles.inputContainer} pointerEvents="auto">
-                                        <TextInput
-                                            style={styles.input}
-                                            placeholder="Write your experience..."
-                                            placeholderTextColor="rgba(255,255,255,0.4)"
-                                            multiline
-                                            numberOfLines={4}
-                                            value={feedback}
-                                            onChangeText={setFeedback}
-                                            blurOnSubmit={false}
-                                            autoFocus={true}
-                                            selectable={true}
-                                            selectionColor="#a855f7"
-                                            cursorColor="#a855f7"
-                                            editable={true}
-                                        />
-                                    </View>
-
-                                    <TouchableOpacity 
-                                        style={[styles.submitBtn, rating === 0 && styles.disabledBtn]} 
-                                        onPress={handleSubmit}
-                                        disabled={rating === 0 || loading}
-                                    >
-                                        {loading ? (
-                                            <ActivityIndicator color="white" />
-                                        ) : (
-                                            <>
-                                                <Text style={styles.submitBtnText}>Submit Review</Text>
-                                                <Send size={18} color="white" style={{ marginLeft: 8 }} />
-                                            </>
-                                        )}
-                                    </TouchableOpacity>
-                                    
-                                    <TouchableOpacity onPress={onClose} style={styles.maybeLaterBtn}>
-                                        <Text style={styles.maybeLaterText}>Maybe Later</Text>
-                                    </TouchableOpacity>
-                                </KeyboardAvoidingView>
-                            )}
-                        </View>
-                    </Animated.View>
-                </View>
-            </TouchableWithoutFeedback>
+                                    {loading ? (
+                                        <ActivityIndicator color="white" />
+                                    ) : (
+                                        <>
+                                            <Text style={styles.submitBtnText}>Submit Review</Text>
+                                            <Send size={18} color="white" style={{ marginLeft: 8 }} />
+                                        </>
+                                    )}
+                                </TouchableOpacity>
+                                
+                                <TouchableOpacity onPress={onClose} style={styles.maybeLaterBtn}>
+                                    <Text style={styles.maybeLaterText}>Maybe Later</Text>
+                                </TouchableOpacity>
+                            </KeyboardAvoidingView>
+                        )}
+                    </View>
+                </Animated.View>
+            </View>
         </ModalComponent>
     );
 };
@@ -263,7 +265,8 @@ const styles = StyleSheet.create({
         color: 'white', 
         fontSize: 15, 
         minHeight: 80,
-        textAlignVertical: 'top'
+        textAlignVertical: 'top',
+        textAlign: 'left'
     },
     submitBtn: { 
         width: '100%',
