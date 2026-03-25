@@ -8,7 +8,7 @@ const HAS_REVIEWED_KEY = 'hasReviewedOrDismissed';
 const TARGET_TIME = 600; // 10 minutes in seconds
 
 const ReviewManager = () => {
-    const { userId, token } = useUser();
+    const { userId, token, user } = useUser();
     const [showModal, setShowModal] = useState(false);
     const [hasReviewed, setHasReviewed] = useState(false);
     const timerRef = useRef(null);
@@ -60,7 +60,7 @@ const ReviewManager = () => {
                 timerRef.current = null;
             }
         };
-    }, [token, userId, hasReviewed]);
+    }, [token, userId, hasReviewed, user]);
 
     const handleClose = async () => {
         setShowModal(false);
