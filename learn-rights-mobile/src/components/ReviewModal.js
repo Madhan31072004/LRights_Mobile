@@ -31,11 +31,14 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
 
+    // Only initialize state when the modal BECOMES visible
+    const isVisibleRef = React.useRef(visible);
     React.useEffect(() => {
-        if (visible) {
+        if (visible && !isVisibleRef.current) {
             setRating(initialRating);
             setFeedback(initialFeedback);
         }
+        isVisibleRef.current = visible;
     }, [visible, initialRating, initialFeedback]);
 
     const handleSubmit = async () => {
