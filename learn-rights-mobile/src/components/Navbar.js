@@ -176,8 +176,8 @@ const Navbar = () => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 100,
-    paddingTop: 50,
+    height: 85,
+    paddingTop: 40,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   // Menu Modal Styles
   menuOverlay: { flex: 1, backgroundColor: '#0f0c29' },
   menuGradient: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 },
-  menuHeader: { height: 100, paddingTop: 50, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  menuHeader: { height: 85, paddingTop: 40, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
   closeBtn: { width: 44, height: 44, justifyContent: 'center', alignItems: 'center' },
   menuContent: { padding: 25 },
   userInfo: { flexDirection: 'row', alignItems: 'center', gap: 15, marginBottom: 35 },

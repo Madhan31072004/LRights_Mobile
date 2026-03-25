@@ -20,9 +20,11 @@ const LeaderboardScreen = () => {
   const fetchLB = async () => {
     try {
         const res = await API.get("/leaderboard/top");
-        setLeaderboard(res.data);
+        // Filter out admin and superadmin roles
+        const filtered = res.data.filter(u => u.role !== 'admin' && u.role !== 'superadmin');
+        setLeaderboard(filtered);
         setIsOffline(false);
-        await AsyncStorage.setItem('cached_leaderboard', JSON.stringify(res.data));
+        await AsyncStorage.setItem('cached_leaderboard', JSON.stringify(filtered));
     } catch (err) {
         console.error(err);
         const cached = await AsyncStorage.getItem('cached_leaderboard');
@@ -189,7 +191,7 @@ const LeaderboardScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
-  scrollContent: { paddingTop: 60, paddingBottom: 40, paddingHorizontal: 20 },
+  scrollContent: { paddingTop: 40, paddingBottom: 40, paddingHorizontal: 20 },
   header: { alignItems: 'center', marginBottom: 30 },
   trophyIcon: { width: 80, height: 80, borderRadius: 25, backgroundColor: 'rgba(124,58,237,0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 15 },
   title: { color: 'white', fontSize: 28, fontWeight: '800' },

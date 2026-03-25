@@ -14,7 +14,9 @@ const Leaderboard = () => {
     const fetchLeaderboard = async () => {
       try {
         const response = await axios.get('/leaderboard');
-        setLeaderboard(response.data);
+        // Filter out admin and superadmin roles
+        const filtered = response.data.filter(u => u.role !== 'admin' && u.role !== 'superadmin');
+        setLeaderboard(filtered);
 
         // Get current user info from localStorage
         const userId = localStorage.getItem('userId');
