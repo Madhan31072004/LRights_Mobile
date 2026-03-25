@@ -20,7 +20,7 @@ services:
     name: learn-rights-frontend
     runtime: node
     buildCommand: npm install && npm run build
-    startCommand: npx serve -s build
+    startCommand: node server.js
     rootDir: learn-rights-frontend
     envVars:
       - key: REACT_APP_API_URL
