@@ -137,16 +137,17 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
                                 <View style={styles.inputContainer}>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Any suggestions or thoughts? (Optional)"
-                                        placeholderTextColor="rgba(255,255,255,0.3)"
+                                        placeholder="Write your experience..."
+                                        placeholderTextColor="rgba(255,255,255,0.4)"
                                         multiline
                                         numberOfLines={4}
                                         value={feedback}
                                         onChangeText={setFeedback}
                                         blurOnSubmit={false}
-                                        autoFocus={visible}
+                                        autoFocus={true}
                                         selectable={true}
                                         selectionColor="#a855f7"
+                                        cursorColor="#a855f7"
                                     />
                                 </View>
 
