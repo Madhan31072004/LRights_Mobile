@@ -440,28 +440,74 @@ const ModulesScreen = () => {
                 <Text style={styles.emptyText}>{t('modules.no_modules')}</Text>
             </View>
         ) : (
-            modulesToShow.map(m => {
+            modulesToShow.map((m, i) => {
                 const prog = getModuleProgress(m);
                 const color = MOD_COLORS[m.code] || "#7c3aed";
+                const status = getStatus(m);
+                
                 return (
-                    <TouchableOpacity key={m._id} style={styles.card} onPress={() => setSelectedModule(m)}>
-                    <View style={[styles.cardAccent, { backgroundColor: color }]} />
-                    <View style={styles.cardHeader}>
-                        <View style={[styles.cardIconBox, { backgroundColor: color + '10' }]}>
-                        <BookOpen color={color} size={20} />
-                        </View>
-                        <Text style={styles.cardCode}>{m.code}</Text>
-                    </View>
-                    <Text style={styles.cardTitle}>{m.title}</Text>
-                    <View style={styles.cardMeta}>
-                        <Layers size={14} color="rgba(255,255,255,0.4)" />
-                        <Text style={styles.cardMetaText}>{t('modules.topics_count', { n: m.topics?.length })}</Text>
-                    </View>
-                    <View style={styles.progBg}>
-                        <View style={[styles.progFill, { width: `${prog}%`, backgroundColor: color }]} />
-                    </View>
-                    <Text style={styles.progText}>{prog}{t('modules.percentage_complete')}</Text>
-                    </TouchableOpacity>
+                    <Animated.View entering={FadeInUp.delay(i * 100)} key={m._id} style={styles.cardContainer}>
+                        <TouchableOpacity 
+                            style={styles.card} 
+                            onPress={() => setSelectedModule(m)}
+                            activeOpacity={0.9}
+                        >
+                            <LinearGradient
+                                colors={[color + '30', color + '10', 'rgba(255,255,255,0.02)']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.cardGradient}
+                            />
+                            
+                            {/* Decorative Background Icon */}
+                            <View style={styles.cardBgIconBox}>
+                                <BookOpen color={color} size={120} style={{ opacity: 0.05 }} />
+                            </View>
+
+                            <View style={styles.cardContent}>
+                                <View style={styles.cardHeader}>
+                                    <View style={[styles.cardIconBox, { backgroundColor: color + '20', borderColor: color + '40' }]}>
+                                        <BookOpen color={color} size={24} />
+                                    </View>
+                                    <View style={styles.headerRight}>
+                                        <Text style={[styles.statusBadge, { color: color, backgroundColor: color + '15' }]}>
+                                            {t(`modules.status.${status}`, { defaultValue: status.replace('-', ' ').toUpperCase() })}
+                                        </Text>
+                                        <Text style={styles.cardCode}>{m.code}</Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.titleSection}>
+                                    <Text style={styles.cardTitle}>{m.title}</Text>
+                                    <View style={styles.cardMeta}>
+                                        <Layers size={14} color="rgba(255,255,255,0.5)" />
+                                        <Text style={styles.cardMetaText}>
+                                            {m.topics?.length || 0} {t('modules.topics_label', { defaultValue: 'Topics' })}
+                                        </Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.progSection}>
+                                    <View style={styles.progHeader}>
+                                        <Text style={styles.progLabel}>{t('modules.progress_label', { defaultValue: 'Progress' })}</Text>
+                                        <Text style={[styles.progPercent, { color: color }]}>{prog}%</Text>
+                                    </View>
+                                    <View style={styles.progBg}>
+                                        <LinearGradient
+                                            colors={[color, color + 'aa']}
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 0 }}
+                                            style={[styles.progFill, { width: `${prog}%` }]}
+                                        />
+                                    </View>
+                                </View>
+                            </View>
+
+                            <View style={[styles.cardActionHint, { borderLeftColor: color }]}>
+                                <ChevronRight color="rgba(255,255,255,0.3)" size={20} />
+                            </View>
+                        </TouchableOpacity>
+                    </Animated.View>
                 );
             })
         )}
@@ -483,18 +529,57 @@ const styles = StyleSheet.create({
   filterTabActive: { backgroundColor: 'rgba(124, 58, 237, 0.2)', borderColor: '#7c3aed' },
   filterTabText: { color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: '700' },
   filterTabTextActive: { color: 'white' },
-  grid: { paddingHorizontal: 20, paddingBottom: 100, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-  card: { width: (width - 55) / 2, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 20, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' },
-  cardAccent: { position: 'absolute', left: 0, top: 0, bottom: 0, width: 4 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  cardIconBox: { width: 35, height: 35, borderRadius: 10, justifyContent: 'center', alignItems: 'center' },
-  cardCode: { color: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: '700' },
-  cardTitle: { color: 'white', fontSize: 16, fontWeight: '700', marginBottom: 8, height: 40 },
-  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 15 },
-  cardMetaText: { color: 'rgba(255,255,255,0.4)', fontSize: 12 },
-  progBg: { height: 4, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 2, marginBottom: 5 },
-  progFill: { height: '100%', borderRadius: 2 },
-  progText: { color: 'rgba(255,255,255,0.5)', fontSize: 10, fontWeight: '600' },
+  grid: { paddingHorizontal: 20, paddingBottom: 100 },
+  cardContainer: { width: '100%', marginBottom: 20 },
+  card: { 
+    width: '100%', 
+    backgroundColor: 'rgba(255,255,255,0.03)', 
+    borderRadius: 24, 
+    borderWidth: 1, 
+    borderColor: 'rgba(255,255,255,0.06)', 
+    overflow: 'hidden',
+    flexDirection: 'row'
+  },
+  cardGradient: { ...StyleSheet.absoluteFillObject },
+  cardBgIconBox: { position: 'absolute', right: -20, bottom: -20 },
+  cardContent: { flex: 1, padding: 20 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 15 },
+  cardIconBox: { 
+    width: 48, 
+    height: 48, 
+    borderRadius: 14, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    borderWidth: 1
+  },
+  headerRight: { alignItems: 'flex-end', gap: 6 },
+  statusBadge: { 
+    fontSize: 9, 
+    fontWeight: '800', 
+    paddingHorizontal: 8, 
+    paddingVertical: 4, 
+    borderRadius: 6,
+    overflow: 'hidden'
+  },
+  cardCode: { color: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  titleSection: { marginBottom: 20 },
+  cardTitle: { color: 'white', fontSize: 19, fontWeight: '800', lineHeight: 26, marginBottom: 8 },
+  cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  cardMetaText: { color: 'rgba(255,255,255,0.5)', fontSize: 13, fontWeight: '600' },
+  progSection: { width: '100%' },
+  progHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 8 },
+  progLabel: { color: 'rgba(255,255,255,0.4)', fontSize: 11, fontWeight: '700', textTransform: 'uppercase' },
+  progPercent: { fontSize: 16, fontWeight: '900' },
+  progBg: { height: 8, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4, overflow: 'hidden' },
+  progFill: { height: '100%', borderRadius: 4 },
+  cardActionHint: { 
+    width: 40, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(255,255,255,0.05)'
+  },
   header: { height: 100, paddingTop: 50, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 15 },
   headerTitle: { color: 'white', fontSize: 20, fontWeight: '700', flex: 1 },
   scrollPadding: { padding: 20 },
