@@ -121,14 +121,7 @@ if (Platform.OS === 'web') {
   `;
   document.head.append(style);
 
-  // Focus trap resolution: Blur elements that are inside aria-hidden containers
-  document.addEventListener('focusin', (e) => {
-    const target = e.target;
-    if (target.closest('[aria-hidden="true"]')) {
-      console.warn('[FocusFix] Prevented focus on aria-hidden element:', target);
-      target.blur();
-    }
-  }, true);
+  /* Focus trap resolution removed to prevent blocking genuine inputs in Modals */
 }
 
 const Navigation = () => {
