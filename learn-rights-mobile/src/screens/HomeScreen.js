@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'; // Refined Onboarding & SOS
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator, Image, RefreshControl, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInRight, ZoomIn, FadeInDown } from 'react-native-reanimated';
-import { BookOpen, Bot, Trophy, LogOut, Users, Languages, Star, ChevronRight, Play, Award, User, Zap, RefreshCcw, AlertCircle, ShieldCheck, ArrowRight, Compass, Flame, Gamepad2, Bell, ShieldAlert, Gavel, CheckCircle2, Pencil } from 'lucide-react-native';
+import { BookOpen, Bot, Trophy, LogOut, Users, Languages, Star, ChevronRight, Play, Award, User, Zap, RefreshCcw, AlertCircle, ShieldCheck, ArrowRight, Compass, Flame, Gamepad2, Bell, ShieldAlert, Gavel, CheckCircle2, Pencil, MessageSquareHeart } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
