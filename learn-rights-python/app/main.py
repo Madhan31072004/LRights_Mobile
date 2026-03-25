@@ -29,6 +29,7 @@ from app.routers import (
     safety,
     stories,
     lawyers,
+    reviews,
 )
 
 logging.basicConfig(level=logging.INFO)
@@ -60,6 +61,7 @@ app.include_router(stories.router, prefix="/api/stories", tags=["stories"])
 app.include_router(safety.router, prefix="/api/safety", tags=["safety"])
 app.include_router(competitions.router, prefix="/api/competitions", tags=["competitions"])
 app.include_router(lawyers.router, prefix="/api/lawyers", tags=["lawyers"])
+app.include_router(reviews.router, prefix="/api/reviews", tags=["reviews"])
 # Static uploads (same as Express)
 if UPLOAD_DIR.exists():
     app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")

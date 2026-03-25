@@ -131,3 +131,6 @@ class SafetyRecordingBody(BaseModel):
     type: str # audio, video
     url: str
     location: dict[str, float] | None = None
+class ReviewCreateBody(BaseModel):
+    rating: int = Field(..., ge=1, le=5)
+    feedback: str | None = None

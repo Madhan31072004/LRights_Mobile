@@ -51,6 +51,7 @@ import Navbar from './src/components/Navbar';
 import { initTranslation, getLanguage, onTranslationChange } from './src/utils/translation';
 import { startSyncInterval } from './src/utils/offlineSync';
 import API from './src/api/axios';
+import ReviewManager from './src/components/ReviewManager';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -213,6 +214,7 @@ export default function App() {
         <SafetyModeProvider>
           <NavigationContainer linking={linking}>
             <Navigation />
+            <ReviewManager />
             <StatusBar style="light" />
           </NavigationContainer>
         </SafetyModeProvider>
