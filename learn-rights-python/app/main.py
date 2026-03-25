@@ -110,6 +110,7 @@ async def manual_cors_middleware(request: Request, call_next):
     return response
 
 @app.get("/Main/Home")
+@app.get("/main/home")
 def home_page():
     return "Home Page Content"
 

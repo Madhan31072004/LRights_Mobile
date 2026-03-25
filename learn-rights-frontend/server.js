@@ -6,8 +6,8 @@ const PORT = process.env.PORT || 3000;
 // Serve static files from the build folder
 app.use(express.static(path.join(__dirname, 'build')));
 
-// Handle the specific route the user mentioned (optional since catch-all handles it)
-app.get('/Main/Home', (req, res) => {
+// Explicitly handle the route requested by the user
+app.get(['/Main/Home', '/main/home'], (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 

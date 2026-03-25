@@ -124,8 +124,9 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
                             </Animated.View>
                         ) : (
                             <KeyboardAvoidingView 
-                                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                                behavior={Platform.OS === 'ios' ? 'padding' : (Platform.OS === 'android' ? 'height' : undefined)}
                                 style={styles.formContent}
+                                keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
                             >
                                 <Text style={styles.questionText}>How are you finding the app so far?</Text>
                                 
@@ -142,6 +143,10 @@ const ReviewModal = ({ visible, onClose, userId, initialRating = 0, initialFeedb
                                         numberOfLines={4}
                                         value={feedback}
                                         onChangeText={setFeedback}
+                                        blurOnSubmit={false}
+                                        autoFocus={visible}
+                                        selectable={true}
+                                        selectionColor="#a855f7"
                                     />
                                 </View>
 
