@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Animated, Dimensions, Alert, Vibration, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Dimensions, Alert, Vibration, ScrollView, Platform } from 'react-native';
 import { ShieldAlert, Phone, MapPin, X, ChevronRight, Zap, Volume2, Activity, Clock, ShieldCheck, Video, Mic } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafety } from '../contexts/SafetyModeContext';
@@ -42,9 +42,18 @@ const SafetyHubScreen = ({ navigation }) => {
     };
 
     const startFakeCall = () => {
+        const msg = "An incoming call from 'Police' will trigger immediately. Use this as an excuse to leave Safely.";
+        
+        if (Platform.OS === 'web') {
+            if (window.confirm(`${t('safety.fake_call')}\n\n${msg}`)) {
+                navigation.navigate('FakeCall');
+            }
+            return;
+        }
+
         Alert.alert(
             t('safety.fake_call'),
-            "An incoming call from 'Police' will trigger immediately. Use this as an excuse to leave Safely.",
+            msg,
             [{ text: "Cancel", style: "cancel" }, { 
                 text: "Start", 
                 onPress: () => {
@@ -55,6 +64,14 @@ const SafetyHubScreen = ({ navigation }) => {
     };
 
     const handleExit = () => {
+        if (Platform.OS === 'web') {
+            if (window.confirm(`${t('safety.exit_title')}\n\n${t('safety.exit_msg')}`)) {
+                deactivateSafetyMode();
+                navigation.navigate('Main', { screen: 'Home' });
+            }
+            return;
+        }
+
         Alert.alert(
             t('safety.exit_title'),
             t('safety.exit_msg'),

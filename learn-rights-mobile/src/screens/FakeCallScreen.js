@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Animated, Vibration, AppState } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Vibration, AppState, Platform } from 'react-native';
 import { Phone, PhoneOff, Mic, Video, Volume2, User } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { createAudioPlayer } from 'expo-audio';
@@ -18,8 +18,17 @@ const FakeCallScreen = ({ navigation }) => {
 
     useEffect(() => {
         (async () => {
-            const { status } = await Camera.requestCameraPermissionsAsync();
-            setHasCamPermission(status === 'granted');
+            if (Platform.OS !== 'web') {
+                try {
+                    const { status } = await Camera.requestCameraPermissionsAsync();
+                    setHasCamPermission(status === 'granted');
+                } catch (e) {
+                    console.log("Camera permission check failed", e);
+                }
+            } else {
+                // On web, we'll request during active call if possible, or just skip preview
+                setHasCamPermission(false);
+            }
 
             try {
                 // Prioritize user-picked file, then system default (Android), then fallback asset
@@ -46,7 +55,9 @@ const FakeCallScreen = ({ navigation }) => {
             }
         })();
         const interval = setInterval(() => {
-            if (status === 'ringing') Vibration.vibrate([500, 1000]);
+            if (status === 'ringing' && Platform.OS !== 'web') {
+                Vibration.vibrate([500, 1000]);
+            }
         }, 1500);
 
         // Auto-answer after 24 seconds
@@ -80,7 +91,7 @@ const FakeCallScreen = ({ navigation }) => {
     const handleAnswer = async () => {
         setStatus('active');
         if (ringtone) ringtone.pause();
-        Vibration.cancel();
+        if (Platform.OS !== 'web') Vibration.cancel();
 
         // Start Audio Recording via Context
         startRecording();
