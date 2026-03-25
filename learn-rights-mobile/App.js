@@ -137,23 +137,11 @@ const Navigation = () => {
 
   const initialLang = getLanguage();
 
-  const linking = {
-    prefixes: [Linking.createURL('/')],
-    config: {
-      screens: {
-        Login: 'login',
-        Signup: 'signup',
-        Welcome: 'welcome',
-      },
-    },
-  };
-
   return (
-    <NavigationContainer linking={linking}>
-      <Stack.Navigator 
-        screenOptions={{ headerShown: false }}
-        initialRouteName={token ? "Main" : (!initialLang ? "LanguageSelect" : "Welcome")}
-      >
+    <Stack.Navigator 
+      screenOptions={{ headerShown: false }}
+      initialRouteName={token ? "Main" : (!initialLang ? "LanguageSelect" : "Welcome")}
+    >
         {!token ? (
           <>
             <Stack.Screen name="LanguageSelect" component={LanguageSelectScreen} />
@@ -190,7 +178,6 @@ const Navigation = () => {
           </>
         )}
       </Stack.Navigator>
-    </NavigationContainer>
   );
 };
 
@@ -209,11 +196,22 @@ export default function App() {
     return unsub;
   }, []);
 
+  const linking = {
+    prefixes: [Linking.createURL('/')],
+    config: {
+      screens: {
+        Login: 'login',
+        Signup: 'signup',
+        Welcome: 'welcome',
+      },
+    },
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <UserProvider>
         <SafetyModeProvider>
-          <NavigationContainer>
+          <NavigationContainer linking={linking}>
             <Navigation />
             <StatusBar style="light" />
           </NavigationContainer>

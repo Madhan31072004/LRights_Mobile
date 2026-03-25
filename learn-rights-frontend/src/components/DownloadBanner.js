@@ -27,7 +27,7 @@ const DownloadBanner = () => {
                     <span className="banner-subtitle">Take your legal education journey anywhere!</span>
                 </div>
                 <div className="banner-actions">
-                    <a href="https://expo.dev/artifacts/eas/mmZKgt2mp91GccBokvjvZB.apk" download="learn-rights.apk" target="_blank" rel="noopener noreferrer" className="download-btn">
+                    <a href="https://expo.dev/artifacts/eas/eXy3t7sCX8EpuwjxDrZ9Eg.apk" download="learn-rights.apk" target="_blank" rel="noopener noreferrer" className="download-btn">
                         Download Now
                     </a>
                     <button className="dismiss-btn" onClick={handleDismiss} aria-label="Close">
