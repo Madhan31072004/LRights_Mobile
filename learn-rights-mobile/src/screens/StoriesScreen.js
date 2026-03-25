@@ -104,8 +104,8 @@ const StoriesScreen = ({ navigation }) => {
             />
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                    <Text style={styles.headerTitle}>{t('stories.title') || 'Inspiring Journeys'}</Text>
-                    <Text style={styles.headerSubtitle}>{t('stories.subtitle') || 'Learn from those who paved the way'}</Text>
+                    <Text style={styles.headerTitle}>{t('stories.title')}</Text>
+                    <Text style={styles.headerSubtitle}>{t('stories.subtitle')}</Text>
                 </View>
             </View>
 
@@ -146,7 +146,7 @@ const StoriesScreen = ({ navigation }) => {
                                 <Text style={styles.storyExcerpt} numberOfLines={2}>{story.excerpt}</Text>
                                 
                                 <View style={styles.readBtn}>
-                                    <Text style={styles.readBtnText}>{t('stories.read_full') || 'Unveiling the Story'}</Text>
+                                    <Text style={styles.readBtnText}>{t('stories.read_full')}</Text>
                                     <ChevronRight size={18} color="white" />
                                 </View>
                             </View>
@@ -170,7 +170,7 @@ const StoriesScreen = ({ navigation }) => {
                         ) : (
                             <>
                                 <Zap size={20} color="white" />
-                                <Text style={styles.discoverText}>Discover More AI Stories</Text>
+                                <Text style={styles.discoverText}>{t('stories.discover_more')}</Text>
                             </>
                         )}
                     </LinearGradient>
@@ -178,7 +178,7 @@ const StoriesScreen = ({ navigation }) => {
 
                 <View style={styles.footerInfo}>
                     <BookOpen size={20} color="rgba(255,255,255,0.2)" />
-                    <Text style={styles.footerText}>New stories generated on demand</Text>
+                    <Text style={styles.footerText}>{t('stories.footer_note')}</Text>
                 </View>
             </ScrollView>
 
@@ -188,7 +188,7 @@ const StoriesScreen = ({ navigation }) => {
                     <Animated.View entering={FadeInUp} style={styles.modalContent}>
                         <View style={styles.modalHeader}>
                             <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedStory(null)}>
-                                <Text style={styles.closeBtnText}>Close</Text>
+                                <Text style={styles.closeBtnText}>{t('home.done')}</Text>
                             </TouchableOpacity>
                             <Text style={styles.modalCategory}>{selectedStory.category}</Text>
                         </View>

@@ -5,7 +5,7 @@ import Animated, { FadeInUp, FadeIn, ZoomIn } from 'react-native-reanimated';
 import { Heart, MessageCircle, Send, Plus, Image as ImageIcon, X, ShieldCheck, Users, Trash2, Flag, AlertTriangle } from 'lucide-react-native';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
-import { t } from '../utils/translation';
+import { t, getCurrentLanguage } from '../utils/translation';
 
 const { width } = Dimensions.get('window');
 
@@ -52,13 +52,14 @@ const CommunityScreen = () => {
             await API.post('/community/posts', {
                 userId: user._id,
                 username: user.name || 'Anonymous',
-                content: newPostContent
+                content: newPostContent,
+                lang: getCurrentLanguage()
             });
             setNewPostContent('');
             setShowCreateModal(false);
             fetchPosts();
         } catch (error) {
-            alert("Failed to create post");
+            alert(t('common.error') || "Failed to create post");
         }
     };
 
@@ -77,8 +78,9 @@ const CommunityScreen = () => {
                                 params: { userId: userId }
                             });
                             setPosts(posts.filter(p => p._id !== postId));
+                            Alert.alert(t('common.success') || "Success", t('community.delete_success'));
                         } catch (err) {
-                            Alert.alert("Error", "Failed to delete post");
+                            Alert.alert(t('common.error') || "Error", t('common.failed') || "Failed to delete post");
                         }
                     }
                 }
@@ -100,9 +102,9 @@ const CommunityScreen = () => {
                                 userId: userId,
                                 reason: "Inappropriate content"
                             });
-                            Alert.alert("Success", "Post reported. Our team will review it.");
+                            Alert.alert(t('common.success') || "Success", t('community.report_success'));
                         } catch (err) {
-                            Alert.alert("Error", "Failed to report post");
+                            Alert.alert(t('common.error') || "Error", t('common.failed') || "Failed to report post");
                         }
                     }
                 }
@@ -137,12 +139,13 @@ const CommunityScreen = () => {
             await API.post(`/community/posts/${postId}/comments`, {
                 userId: user._id,
                 username: user.name || 'Anonymous',
-                text: text
+                text: text,
+                lang: getCurrentLanguage()
             });
             setCommentTexts({ ...commentTexts, [postId]: '' });
             fetchPosts();
         } catch (error) {
-            alert("Failed to add comment");
+            alert(t('common.error') || "Failed to add comment");
         }
     };
 
@@ -283,8 +286,8 @@ const CommunityScreen = () => {
                     <Animated.View entering={FadeInUp.springify()} style={styles.modalContent}>
                         <View style={styles.modalHeader}>
                             <View>
-                                <Text style={styles.modalTitle}>{t('community.create_post') || 'Create Post'}</Text>
-                                <Text style={styles.modalSubtitle}>Share your voice with the community</Text>
+                                <Text style={styles.modalTitle}>{t('community.create_post')}</Text>
+                                <Text style={styles.modalSubtitle}>{t('community.create_post_sub')}</Text>
                             </View>
                             <TouchableOpacity onPress={() => setShowCreateModal(false)} style={styles.modalCloseBtn}>
                                 <X color="white" size={24} />

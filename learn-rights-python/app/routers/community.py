@@ -32,6 +32,7 @@ async def create_post(body: PostCreateBody, db: Database = Depends(get_db)):
             "username": body.username,
             "content": body.content,
             "imageUrl": body.imageUrl,
+            "lang": body.lang,
             "likes": [],
             "comments": [],
             "createdAt": datetime.utcnow()
@@ -76,6 +77,7 @@ async def add_comment(postId: str, body: CommentCreateBody, db: Database = Depen
             "userId": body.userId,
             "username": body.username,
             "text": body.text,
+            "lang": body.lang,
             "createdAt": datetime.utcnow()
         }
         result = db.community_posts.update_one(

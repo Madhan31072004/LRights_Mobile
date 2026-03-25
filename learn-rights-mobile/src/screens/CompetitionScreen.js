@@ -63,7 +63,8 @@ const CompetitionScreen = () => {
                 userId: user._id,
                 username: user.name || 'Learner',
                 competitionId: selectedComp._id,
-                essayContent: essay
+                essayContent: essay,
+                lang: language
             });
             setSuccessData(res.data);
         } catch (error) {
@@ -125,8 +126,8 @@ const CompetitionScreen = () => {
         <View style={styles.container}>
             <LinearGradient colors={['#0f0c29', '#1a1744']} style={styles.header}>
                 <View style={styles.headerContent}>
-                    <Text style={styles.headerTitle}>{t('comp.title') || 'Global Competitions'}</Text>
-                    <Text style={styles.headerSubtitle}>{t('comp.subtitle') || 'Compete, Learn & Get Recognized'}</Text>
+                    <Text style={styles.headerTitle}>{t('comp.title')}</Text>
+                    <Text style={styles.headerSubtitle}>{t('comp.subtitle')}</Text>
                 </View>
             </LinearGradient>
 
@@ -180,7 +181,7 @@ const CompetitionScreen = () => {
                         
                         {selectedComp.rules && (
                             <View style={styles.rulesBox}>
-                                <Text style={styles.rulesTitle}>Submission Guidelines:</Text>
+                                <Text style={styles.rulesTitle}>{t('comp.guidelines')}</Text>
                                 {selectedComp.rules.map((rule, ri) => (
                                     <View key={ri} style={styles.ruleItem}>
                                         <View style={styles.ruleDot} />
@@ -194,7 +195,7 @@ const CompetitionScreen = () => {
                             <LinearGradient colors={['rgba(167,139,250,0.1)', 'rgba(167,139,250,0.05)']} style={styles.promptGradient}>
                                 <View style={styles.promptHeader}>
                                     <PenTool size={18} color="#a78bfa" />
-                                    <Text style={styles.promptTitle}>THE PROMPT</Text>
+                                    <Text style={styles.promptTitle}>{t('comp.prompt_title')}</Text>
                                 </View>
                                 <Text style={styles.promptText}>{selectedComp.prompt}</Text>
                             </LinearGradient>
@@ -202,13 +203,13 @@ const CompetitionScreen = () => {
 
                         <View style={styles.inputSection}>
                             <View style={styles.inputHeader}>
-                                <Text style={styles.inputTitle}>Your Submission</Text>
-                                <Text style={styles.wordCount}>{essay.trim() ? essay.trim().split(/\s+/).length : 0} words</Text>
+                                <Text style={styles.inputTitle}>{t('comp.your_submission')}</Text>
+                                <Text style={styles.wordCount}>{t('comp.word_count', { n: essay.trim() ? essay.trim().split(/\s+/).length : 0 })}</Text>
                             </View>
                             <View style={styles.inputWrap}>
                                 <TextInput
                                     style={styles.essayInput}
-                                    placeholder={t('comp.essay_placeholder') || "Share your profound thoughts and analysis here..."}
+                                    placeholder={t('comp.essay_placeholder')}
                                     placeholderTextColor="rgba(255,255,255,0.2)"
                                     multiline
                                     value={essay}
@@ -226,7 +227,7 @@ const CompetitionScreen = () => {
                                 <ActivityIndicator color="white" />
                             ) : (
                                 <View style={styles.submitBtnContent}>
-                                    <Text style={styles.submitBtnText}>{t('comp.submit') || 'Submit for 50 Points'}</Text>
+                                    <Text style={styles.submitBtnText}>{t('comp.submit')}</Text>
                                     <ChevronRight size={18} color="white" />
                                 </View>
                             )}

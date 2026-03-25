@@ -40,6 +40,7 @@ async def submit_competition_entry(compId: str, body: CompetitionSubmitBody, db:
             "userId": body.userId,
             "username": body.username,
             "essayContent": body.essayContent,
+            "lang": body.lang,
             "status": "pending",
             "submittedAt": datetime.utcnow()
         }
@@ -55,6 +56,7 @@ async def submit_competition_entry(compId: str, body: CompetitionSubmitBody, db:
                 
                 prompt = f"""
                 You are an expert evaluator grading a competition essay for 'LearnRights', an educational platform for women's rights in India.
+                The student has submitted the essay in the language: {body.lang}.
                 Topic: {comp.get('title', '')}
                 Prompt: {comp.get('prompt', '')}
                 Rules: {comp.get('rules', [])}
@@ -62,8 +64,9 @@ async def submit_competition_entry(compId: str, body: CompetitionSubmitBody, db:
                 Essay to evaluate:
                 "{body.essayContent}"
                 
-                Evaluate the essay strictly on the following criteria out of 100 points total:
-                1. Legal Accuracy (30 pts): Correct usage of laws, sections, and legal concepts.
+                Evaluate the essay strictly on the following criteria out of 100 points total.
+                Please provide your feedback and breakdown in English, regardless of the essay's language.
+                1. Legal Accuracy (30 pts): Correct usage of laws, sections, and legal concepts relevant to the topic.
                 2. Originality (20 pts): Unique perspective and personal voice.
                 3. Clarity & Coherence (20 pts): Clear structure and easy-to-follow arguments.
                 4. Impact & Depth (30 pts): Depth of analysis and potential to inspire or inform.
@@ -71,7 +74,7 @@ async def submit_competition_entry(compId: str, body: CompetitionSubmitBody, db:
                 Respond ONLY with a valid JSON object in the exact format:
                 {{
                   "score": total_score_integer,
-                  "feedback": "Overall brief feedback",
+                  "feedback": "Overall brief feedback in English",
                   "breakdown": {{
                     "Legal Accuracy": score_out_of_30,
                     "Originality": score_out_of_20,

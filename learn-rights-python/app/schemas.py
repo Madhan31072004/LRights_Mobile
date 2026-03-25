@@ -74,17 +74,20 @@ class PostCreateBody(BaseModel):
     username: str
     content: str
     imageUrl: str | None = None
+    lang: str = "en"
 
 class CommentCreateBody(BaseModel):
     userId: str
     username: str
     text: str
+    lang: str = "en"
 
 class CompetitionSubmitBody(BaseModel):
     userId: str
     username: str
     competitionId: str
     essayContent: str
+    lang: str = "en"
 
 class ReportPostBody(BaseModel):
     userId: str
