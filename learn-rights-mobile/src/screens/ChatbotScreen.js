@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Image, Dimensions, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { Bot, User, Send, Mic, Image as ImageIcon, Trash2, Volume2, XCircle } from 'lucide-react-native';
@@ -118,6 +118,40 @@ const ChatbotScreen = () => {
     }
   };
 
+  const renderText = (text, isBot) => {
+    if (!text) return null;
+    
+    // 1. Basic Markdown-lite: Bold (**text**)
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    
+    return (
+      <View style={styles.textWrapper}>
+        <Text style={[styles.msgText, !isBot && { color: 'white' }]}>
+          {parts.map((p, i) => {
+            if (p.startsWith('**') && p.endsWith('**')) {
+              return (
+                <Text key={i} style={styles.boldText}>
+                  {p.slice(2, -2)}
+                </Text>
+              );
+            }
+            return p;
+          })}
+        </Text>
+        {isBot && (
+            <View style={styles.botFooter}>
+                <TouchableOpacity onPress={() => Speech.speak(text, { language: language })} style={styles.speakBtnMini}>
+                    <Volume2 size={12} color="rgba(255,255,255,0.4)" />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => Linking.openURL('tel:181')} style={styles.helplineBtn}>
+                    <Text style={styles.helplineText}>📞 181</Text>
+                </TouchableOpacity>
+            </View>
+        )}
+      </View>
+    );
+  };
+
   const toggleSpeech = async () => {
       if (recording) {
           // Stop recording
@@ -203,15 +237,10 @@ const ChatbotScreen = () => {
                      <View style={[styles.avatarBox, m.sender === 'user' && { order: 1 }]}>
                         {m.sender === 'user' ? <User size={16} color="white" /> : <Bot size={16} color="#7c3aed" />}
                      </View>
-                     <View style={[styles.bubble, m.sender === 'user' ? styles.bubbleUser : styles.bubbleBot, m.error && styles.bubbleError]}>
+                      <View style={[styles.bubble, m.sender === 'user' ? styles.bubbleUser : styles.bubbleBot, m.error && styles.bubbleError]}>
                         {m.image && <Image source={{ uri: m.image.uri }} style={styles.msgImg} />}
-                        <Text style={[styles.msgText, m.sender === 'user' && { color: 'white' }]}>{m.text}</Text>
-                        {m.sender === 'bot' && (
-                            <TouchableOpacity onPress={() => Speech.speak(m.text, { language: language })} style={styles.speakBtn}>
-                                <Volume2 size={14} color="rgba(255,255,255,0.4)" />
-                            </TouchableOpacity>
-                        )}
-                     </View>
+                        {renderText(m.text, m.sender === 'bot')}
+                      </View>
                 </Animated.View>
             ))
         )}
@@ -282,9 +311,15 @@ const styles = StyleSheet.create({
   avatarBox: { width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(124,58,237,0.2)' },
   bubble: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 20, maxWidth: width * 0.75 },
   bubbleUser: { backgroundColor: '#7c3aed', borderBottomRightRadius: 4 },
-  bubbleBot: { backgroundColor: 'rgba(255,255,255,0.08)', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
+  bubbleBot: { backgroundColor: 'rgba(255,255,255,0.06)', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: 'rgba(255,255,255,0.04)', paddingVertical: 14 },
   bubbleError: { borderColor: '#ef4444' },
-  msgText: { color: 'rgba(255,255,255,0.9)', fontSize: 15, lineHeight: 22 },
+  msgText: { color: 'rgba(255,255,255,0.92)', fontSize: 16, lineHeight: 24, letterSpacing: 0.2 },
+  boldText: { fontWeight: '800', color: 'white' },
+  textWrapper: { width: '100%' },
+  botFooter: { marginTop: 12, flexDirection: 'row', alignItems: 'center', gap: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)', paddingTop: 10 },
+  speakBtnMini: { padding: 4 },
+  helplineBtn: { backgroundColor: 'rgba(124,58,237,0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(124,58,237,0.3)' },
+  helplineText: { color: '#a78bfa', fontSize: 11, fontWeight: '700' },
   msgImg: { width: width * 0.5, height: 150, borderRadius: 15, marginBottom: 10 },
   speakBtn: { marginTop: 8, alignSelf: 'flex-end' },
   disclaimer: { color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 30, paddingHorizontal: 20 },

@@ -297,7 +297,13 @@ def chatbot(body: AIChatbotBody):
             "3. If requested legal info is in 'Relevant Module Content', prioritize it over internal knowledge.\n\n"
             f"LEGAL GROUNDING (2024-2025 Updates):\n{RECENT_LEGAL_CONTEXT}\n\n"
             f"USER STATE:\n{dynamic_context}\n\n"
-            "Style: Empathetic, thorough, and organized with clear headings."
+            "Style: Professional but Empathetic, thorough, and highly organized using Markdown.\n"
+            "RESPONSE STRUCTURE:\n"
+            "1. **Summary**: A concise 1-2 sentence direct answer.\n"
+            "2. **Detailed Information**: Use logical sections with bold headers (e.g., **Your Legal Rights**, **Applicable Laws**).\n"
+            "3. **Proposed Action Steps**: A numbered list of 2-3 concrete steps the user can take (e.g., 'Contact a lawyer', 'Visit the nearest station').\n"
+            "4. **Reassurance**: A final supportive sentence.\n\n"
+            "IMPORTANT: Always use bullet points for lists and bold for emphasis to ensure readability on mobile."
         )
         
         model = _get_google_model(system_instruction=system_instruction)
