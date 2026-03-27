@@ -137,11 +137,17 @@ def get_modules(lang: str = "en"):
             if google_code:
                 try:
                     cache = _get_mod_cache(lang) or {}
-                    # Translate all modules using cache
-                    for m in modules:
-                        _translate_module(m, lang, cache)
-                    # Note: Sequential translation above is slow if cache is cold.
-                    # We'll save the cache regardless of success to avoid re-translating on next request
+                    
+                    # Parallel translation using ThreadPoolExecutor
+                    with ThreadPoolExecutor(max_workers=10) as executor:
+                        # We submit translation tasks for each module
+                        futures = {executor.submit(_translate_module, m, lang, cache): m for m in modules}
+                        for future in futures:
+                            try:
+                                future.result()
+                            except Exception as e:
+                                logger.warning(f"Parallel translation sub-task failed: {e}")
+                    
                     _save_mod_cache(lang, cache)
                 except Exception as e:
                     logger.error(f"Module translation failed for lang={lang}: {e}")
@@ -178,36 +184,45 @@ def get_modules_with_progress(userId: str, lang: str = "en"):
         # Fetch all modules
         all_mods = list(db["modules"].find().sort([("order", 1), ("code", 1)]))
         
-        for m in all_mods:
-            module_code = m.get("code", str(m["_id"]))
-            module_sub_ids = []
-            # Calculate structure to match _ser logic
-            for ti, topic in enumerate(m.get("topics") or []):
-                for si, st in enumerate(topic.get("subTopics") or []):
-                    sid = f"{module_code}-T{ti}-S{si}"
-                    module_sub_ids.append(sid)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            futures = []
+            for m in all_mods:
+                module_code = m.get("code", str(m["_id"]))
+                module_sub_ids = []
+                # Calculate structure to match _ser logic
+                for ti, topic in enumerate(m.get("topics") or []):
+                    for si, st in enumerate(topic.get("subTopics") or []):
+                        sid = f"{module_code}-T{ti}-S{si}"
+                        module_sub_ids.append(sid)
+                
+                total = len(module_sub_ids)
+                done = sum(1 for c in completed_sub if c in module_sub_ids)
+                pct = round((done / total) * 100) if total else 0
+                is_done = str(m["_id"]) in completed_mod
+                
+                serialized = _ser(dict(m))
+                
+                # Submit for translation
+                if lang and lang != "en":
+                    futures.append(executor.submit(_translate_module, serialized, lang, cache))
+                
+                out.append({
+                    "data": serialized,
+                    "meta": {"completedSubTopics": done, "totalSubTopics": total, "percentage": pct, "isCompleted": is_done},
+                })
             
-            total = len(module_sub_ids)
-            done = sum(1 for c in completed_sub if c in module_sub_ids)
-            pct = round((done / total) * 100) if total else 0
-            is_done = str(m["_id"]) in completed_mod
-            
-            serialized = _ser(dict(m))
-            if lang and lang != "en":
+            # Wait for all translations
+            for f in futures:
                 try:
-                    _translate_module(serialized, lang, cache)
-                except Exception as e:
-                    logger.warning(f"Translation failed for module {serialized.get('code')}: {e}")
-            
-            out.append({
-                **serialized,
-                "progress": {"completedSubTopics": done, "totalSubTopics": total, "percentage": pct, "isCompleted": is_done},
-            })
+                    f.result()
+                except:
+                    pass
 
         if lang and lang != "en":
             _save_mod_cache(lang, cache)
             
-        return out
+        # Re-map results
+        return [{**item["data"], "progress": item["meta"]} for item in out]
     except Exception as e:
         logger.error(f"CRITICAL USER MODULES ERROR: {e}")
         traceback.print_exc()
