@@ -5,6 +5,8 @@ import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
 import { Bot, User, Send, Mic, Image as ImageIcon, Trash2, Volume2, XCircle } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
+import * as FileSystem from 'expo-file-system';
+import { AudioModule, RecordingPresets } from 'expo-audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
@@ -18,6 +20,7 @@ const ChatbotScreen = () => {
   const [input, setInput] = React.useState('');
   const [isTyping, setIsTyping] = React.useState(false);
   const [isListening, setIsListening] = React.useState(false);
+  const [recording, setRecording] = React.useState(null);
   const [selectedImage, setSelectedImage] = React.useState(null);
   const [autoSpeak, setAutoSpeak] = React.useState(false);
   const scrollRef = React.useRef();
@@ -43,16 +46,18 @@ const ChatbotScreen = () => {
     saveHistory();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() && !selectedImage) return;
+  const handleSend = async (audioBase64 = null) => {
+    if (!input.trim() && !selectedImage && !audioBase64) return;
     
     const userMsg = { 
-        text: input, 
+        text: input || (audioBase64 ? t('chatbot.voice_message', { defaultValue: '🎤 Voice Message' }) : ""), 
         sender: 'user', 
         id: Date.now(),
-        image: selectedImage
+        image: selectedImage,
+        isAudio: !!audioBase64
     };
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput('');
     setSelectedImage(null);
     setIsTyping(true);
@@ -76,17 +81,18 @@ const ChatbotScreen = () => {
       `;
 
       const payload = {
-        message: input || t('chatbot.analyze_image', { defaultValue: 'Analyze this image' }),
+        message: currentInput || (selectedImage ? t('chatbot.analyze_image', { defaultValue: 'Analyze this image' }) : ""),
         context: smartContext,
         lang: language,
         history: history,
-        imageBase64: selectedImage ? selectedImage.base64 : null
+        imageBase64: selectedImage ? selectedImage.base64 : null,
+        audioBase64: audioBase64
       };
       const res = await API.post('/ai/chatbot', payload);
       
       const botMsg = { text: res.data.response, sender: 'bot', id: Date.now() + 1 };
       setMessages(prev => [...prev, botMsg]);
-      if (autoSpeak) Speech.speak(botMsg.text);
+      if (autoSpeak) Speech.speak(botMsg.text, { language: language });
     } catch (err) {
         console.error(err);
         setMessages(prev => [...prev, { text: t('chatbot.error'), sender: 'bot', id: Date.now() + 1, error: true }]);
@@ -112,13 +118,34 @@ const ChatbotScreen = () => {
     }
   };
 
-  const toggleSpeech = () => {
-      setIsListening(!isListening);
-      if(!isListening) {
-          setTimeout(() => {
-              setInput("What are my legal rights?");
-              setIsListening(false);
-          }, 2000);
+  const toggleSpeech = async () => {
+      if (recording) {
+          // Stop recording
+          setIsListening(false);
+          try {
+              await recording.stop();
+              const uri = recording.uri;
+              setRecording(null);
+              
+              // Convert to base64
+              const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+              handleSend(base64);
+          } catch (e) {
+              console.error("Stop recording error", e);
+          }
+      } else {
+          // Start recording
+          try {
+              const { status } = await AudioModule.requestRecordingPermissionsAsync();
+              if (status !== 'granted') return;
+              
+              const newRecording = new AudioModule.AudioRecorder(RecordingPresets.HIGH_QUALITY);
+              await newRecording.record();
+              setRecording(newRecording);
+              setIsListening(true);
+          } catch (e) {
+              console.error("Start recording error", e);
+          }
       }
   };
 
@@ -180,7 +207,7 @@ const ChatbotScreen = () => {
                         {m.image && <Image source={{ uri: m.image.uri }} style={styles.msgImg} />}
                         <Text style={[styles.msgText, m.sender === 'user' && { color: 'white' }]}>{m.text}</Text>
                         {m.sender === 'bot' && (
-                            <TouchableOpacity onPress={() => Speech.speak(m.text)} style={styles.speakBtn}>
+                            <TouchableOpacity onPress={() => Speech.speak(m.text, { language: language })} style={styles.speakBtn}>
                                 <Volume2 size={14} color="rgba(255,255,255,0.4)" />
                             </TouchableOpacity>
                         )}

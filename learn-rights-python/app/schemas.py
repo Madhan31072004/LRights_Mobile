@@ -56,12 +56,13 @@ class UpdateProfileBody(BaseModel):
 
 
 class AIChatbotBody(BaseModel):
-    message: str
+    message: str | None = None
     context: str | None = None
     lang: str = "en"
     history: list[dict[str, Any]] | None = None
     imageBase64: str | None = None
     imageMimeType: str | None = None
+    audioBase64: str | None = None
 
 class AIQuizBody(BaseModel):
     moduleId: str

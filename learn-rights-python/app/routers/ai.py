@@ -247,8 +247,10 @@ def _parse_base64_image(data_url_or_base64: str):
 def chatbot(body: AIChatbotBody):
     message = (body.message or "").strip()[:1000]
     has_image = bool(body.imageBase64 and (body.imageBase64.strip() if isinstance(body.imageBase64, str) else True))
-    if not message and not has_image:
-        raise HTTPException(status_code=400, detail="Message or image is required")
+    has_audio = bool(getattr(body, "audioBase64", None) and body.audioBase64.strip())
+    
+    if not message and not has_image and not has_audio:
+        raise HTTPException(status_code=400, detail="Message, image, or audio is required")
     
     lang_name = _get_lang_name(body.lang)
     
@@ -294,6 +296,7 @@ def chatbot(body: AIChatbotBody):
             "2. If the user asks about their progress, streak, or points, use the 'Context' to answer accurately.\n"
             "3. If requested legal info is in 'Relevant Module Content', prioritize it over internal knowledge.\n\n"
             f"LEGAL GROUNDING (2024-2025 Updates):\n{RECENT_LEGAL_CONTEXT}\n\n"
+            f"USER STATE:\n{dynamic_context}\n\n"
             "Style: Empathetic, thorough, and organized with clear headings."
         )
         
@@ -313,8 +316,12 @@ def chatbot(body: AIChatbotBody):
                     continue
 
         chat = model.start_chat(history=hist)
-        user_content = f"Context: {dynamic_context}\n\nUser Message: {message or '(no text, see image)'}"
         
+        # Prepare parts for send_message (text + optional image/audio)
+        content_parts = []
+        if message:
+            content_parts.append(message)
+            
         if image_b64 and image_mime:
             import base64
             import io
@@ -322,15 +329,24 @@ def chatbot(body: AIChatbotBody):
                 raw = base64.b64decode(image_b64, validate=True)
             except Exception:
                 raw = base64.b64decode(image_b64)
+            # Use PIL for safety/validation if available, or raw dict
             try:
                 from PIL import Image
                 img = Image.open(io.BytesIO(raw))
-                response = chat.send_message([img, user_content])
+                content_parts.append(img)
             except Exception:
-                image_part = {"mime_type": image_mime, "data": raw}
-                response = chat.send_message([image_part, user_content])
-        else:
-            response = chat.send_message(user_content)
+                content_parts.append({"mime_type": image_mime, "data": raw})
+                
+        if has_audio:
+            import base64
+            # We assume a common audio format like aac or wav from expo-audio
+            audio_raw = base64.b64decode(body.audioBase64)
+            content_parts.append({"mime_type": "audio/aac", "data": audio_raw})
+
+        if not content_parts:
+            content_parts.append("(User sent empty input)")
+            
+        response = chat.send_message(content_parts)
             
         text = (getattr(response, "text", None) or "").strip()
         if not text:
