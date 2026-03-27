@@ -9,12 +9,12 @@ const prodURL = "https://lrights-mobile-python.onrender.com/api";
 const fallbackLocalIPs = [
   "http://localhost:5000/api",
   "http://127.0.0.1:5000/api",
-  "http://192.168.1.100:5000/api",
+  "http://192.168.0.197:5000/api",
 ];
 
 const baseURL = process.env.NODE_ENV === 'production' 
   ? prodURL 
-  : (process.env.EXPO_PUBLIC_API_URL || "http://192.168.139.150:5000/api");
+  : (process.env.EXPO_PUBLIC_API_URL || "http://192.168.0.197:5000/api");
 
 
 const instance = axios.create({
