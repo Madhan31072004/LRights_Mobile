@@ -94,45 +94,54 @@ def _clean_ai_json(text):
     return text
 
 
-def _get_google_model():
+def _get_google_model(system_instruction: str = None):
     if not GOOGLE_AI_API_KEY:
         raise ValueError("Google AI API key not configured")
     import google.generativeai as genai
     genai.configure(api_key=GOOGLE_AI_API_KEY)
-    return genai.GenerativeModel(
-        GEMINI_MODEL,
-        generation_config=genai.GenerationConfig(
+    
+    model_kwargs = {
+        "model_name": GEMINI_MODEL,
+        "generation_config": genai.GenerationConfig(
             max_output_tokens=2048,
-            temperature=1.0,  # Max variety
-        ),
-    )
+            temperature=1.0, # Max variety
+        )
+    }
+    
+    if system_instruction:
+        model_kwargs["system_instruction"] = system_instruction
+        
+    return genai.GenerativeModel(**model_kwargs)
 
-def _get_module_context(module_id: str):
-    """Fetch module info from DB for grounding."""
-    from app.database import get_db
-    db = get_db()
-    mod = db["modules"].find_one({"code": module_id})
-    if not mod:
-        # Try finding by topic title if code not found
-        mod = db["modules"].find_one({"title": {"$regex": module_id, "$options": "i"}})
-    
-    if not mod:
-        print(f"DEBUG: No module found for grounding: {module_id}")
-        return ""
-    
-    context = f"Module: {mod.get('title')}\nDescription: {mod.get('description')}\n"
-    print(f"DEBUG: Grounding Module Found: {mod.get('title')}")
-    topics = mod.get("topics", [])
-    if topics:
-        # Pick 2 random topics for variety
-        sampled = random.sample(topics, min(len(topics), 2))
-        for t in sampled:
-            context += f"Topic: {t.get('title')}\n"
-            subtopics = t.get("subTopics", [])
-            if subtopics:
-                st = random.choice(subtopics)
-                context += f"SubTopic: {st.get('title')}\nContent: {st.get('content')[:500]}\n"
     return context
+
+def _get_keyword_context(message: str):
+    """Search for relevant module context based on keywords in user message."""
+    try:
+        from app.database import get_db
+        db = get_db()
+        # Extract meaningful keywords
+        words = re.findall(r'\w+', message.lower())
+        common = {"the", "and", "rights", "legal", "what", "how", "india", "woman", "women", "help"}
+        keywords = [w for w in words if w not in common and len(w) > 3]
+        
+        if not keywords:
+            return ""
+            
+        # Search modules for matching keywords
+        regex = "|".join(keywords)
+        matched_mod = db["modules"].find_one({
+            "$or": [
+                {"title": {"$regex": regex, "$options": "i"}},
+                {"description": {"$regex": regex, "$options": "i"}}
+            ]
+        })
+        
+        if matched_mod:
+            return _get_module_context(matched_mod["code"])
+    except Exception as e:
+        print(f"Keyword Grounding Error: {e}")
+    return ""
 
 RECENT_LEGAL_CONTEXT = """
 RECENT UPDATES (2024-2025):
@@ -240,7 +249,15 @@ def chatbot(body: AIChatbotBody):
     has_image = bool(body.imageBase64 and (body.imageBase64.strip() if isinstance(body.imageBase64, str) else True))
     if not message and not has_image:
         raise HTTPException(status_code=400, detail="Message or image is required")
-    context = (body.context or "General legal education and support for women in India")
+    
+    lang_name = _get_lang_name(body.lang)
+    
+    # Build Grounding Context
+    dynamic_context = (body.context or "General legal education and support for women in India")
+    keyword_context = _get_keyword_context(message)
+    if keyword_context:
+        dynamic_context += f"\n\nRelevant Module Content for Grounding:\n{keyword_context}"
+    
     # Normalize image: support data URL or raw base64 from frontend
     image_b64, image_mime = None, None
     if body.imageBase64:
@@ -257,20 +274,26 @@ def chatbot(body: AIChatbotBody):
         settings = db["settings"].find_one({"type": "bot"})
         db_system = settings.get("systemPrompt") if settings else None
         
-        model = _get_google_model()
-        lang_name = _get_lang_name(body.lang)
-        
         default_system = (
             "You are LegalAid AI, a personalized smart tutor specializing in women's rights and laws in India. "
             "Provide detailed, well-structured, and descriptive answers. Use clear headings, bullet points, and numbered lists. "
             "Explain legal concepts simply. Always mention relevant Indian laws (Acts and Sections). "
-            "Include practical steps and relevant helpline numbers. "
             "Emergency contacts: Police 100, Women's Helpline 181, NCW Helpline 7827-170-170. "
             "Be empathetic, thorough, and organized."
         )
         
         base_system = db_system if db_system else default_system
-        system = f"{base_system}\n\nYOU MUST RESPOND ENTIRELY IN {lang_name.upper()}. Use the provided 'Context' to understand the user's learning progress."
+        
+        # CORE INSTRUCTION: Strict Language Adherence + Recent Legal Grounding
+        system_instruction = (
+            f"{base_system}\n\n"
+            f"STRICT INSTRUCTION: YOU MUST RESPOND ENTIRELY IN {lang_name.upper()}. "
+            "Do not switch to English even for technical terms if possible; use the script of the target language.\n\n"
+            f"LEGAL GROUNDING (2024-2025 Updates):\n{RECENT_LEGAL_CONTEXT}\n\n"
+            "Ground your response in the 'Context' provided in the user message, which includes user progress and relevant module summaries."
+        )
+        
+        model = _get_google_model(system_instruction=system_instruction)
 
         hist = []
         if body.history and isinstance(body.history, list):
@@ -286,7 +309,8 @@ def chatbot(body: AIChatbotBody):
                     continue
 
         chat = model.start_chat(history=hist)
-        user_content = f"{system}\n\nContext: {context}\n\nUser: {message or '(no text, see image)'}"
+        user_content = f"Context: {dynamic_context}\n\nUser Message: {message or '(no text, see image)'}"
+        
         if image_b64 and image_mime:
             import base64
             import io
@@ -303,30 +327,38 @@ def chatbot(body: AIChatbotBody):
                 response = chat.send_message([image_part, user_content])
         else:
             response = chat.send_message(user_content)
+            
         text = (getattr(response, "text", None) or "").strip()
         if not text:
             raise ValueError("Empty AI response")
-        enhanced = (
-            text
-            + "\n\n---\n"
-            + "Legal Disclaimer: This is educational information only. For personalized legal advice consult a qualified attorney.\n"
-            + "Women's Helpline: 181 | Police: 100 | Ambulance: 108"
-        )
-        return {"response": enhanced, "metadata": {"aiPowered": True, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "disclaimer": "Educational information only"}}
+            
+        # Add localized footer
+        footer_map = {
+            "hi": "\n\n---\nकानूनी अस्वीकरण: यह केवल शैक्षिक जानकारी है। व्यक्तिगत कानूनी सलाह के लिए वकील से परामर्श लें।\nमहिला हेल्पलाइन: 181 | पुलिस: 100",
+            "te": "\n\n---\nన్యాయపరమైన నిరాకరణ: ఇది కేవలం విద్యా సమాచారం మాత్రమే. వ్యక్తిగత న్యాయ సలహా కోసం న్యాయవాదిని సంప్రదించండి.\nమహిళా హెల్ప్‌లైన్: 181 | పోలీసు: 100",
+            "en": "\n\n---\nLegal Disclaimer: Educational information only. Consult an attorney for legal advice.\nWomen's Helpline: 181 | Police: 100"
+        }
+        footer = footer_map.get(body.lang, footer_map["en"])
+        
+        return {"response": text + footer, "metadata": {"aiPowered": True, "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "lang": body.lang}}
+        
     except Exception as e:
         import traceback
-        traceback.print_exc()
+        # Log error to file
+        with open("ai_errors.txt", "a", encoding="utf-8") as f:
+            f.write(f"[{datetime.now()}] Chatbot Error: {str(e)}\n{traceback.format_exc()}\n\n")
+            
         e_str = str(e).lower()
-        if "429" in e_str or "quota" in e_str or "exhausted" in e_str:
-            return {"response": "The AI service is currently busy (Rate Limit). Please wait a few seconds and try again.", "metadata": {"aiPowered": False}}
-        lower = message.lower()
-        if "emergency" in lower or "danger" in lower or "help me" in lower or "hurt" in lower or "unsafe" in lower:
-            return {"response": "EMERGENCY: Call Police 100, Women's Helpline 181 (24/7), Ambulance 108. Go to a safe place and contact authorities.", "metadata": {"aiPowered": False}}
-        if "domestic violence" in lower or "abuse" in lower:
-            return {"response": "Under PWDVA 2005, domestic violence includes physical, emotional, sexual, economic abuse. You can get protection orders. Call 181 for help. This is educational only.", "metadata": {"aiPowered": False}}
-        if "workplace" in lower or "harassment" in lower or "posh" in lower:
-            return {"response": "POSH Act 2013 protects against sexual harassment at work. File complaint with Internal Complaints Committee within 3 months. This is educational only.", "metadata": {"aiPowered": False}}
-        return {"response": "I specialize in women's rights in India (domestic violence, workplace harassment, marriage, property). Please share your specific question. Helpline: 181.", "metadata": {"aiPowered": False}}
+        if "429" in e_str or "quota" in e_str:
+            return {"response": "Service busy (Limit reached). Please retry in 1 minute.", "metadata": {"aiPowered": False}}
+            
+        # Localized Fallbacks
+        fallbacks = {
+            "hi": "नमस्ते, मैं महिलाओं के अधिकारों (हस्तक्षेप, संपत्ति, कार्यस्थल) में मदद कर सकती हूँ। कृपया अपना प्रश्न पूछें। हेल्पलाइन: 181",
+            "te": "నమస్కారం, నేను మహిళల హక్కుల (ఆస్తి, పని ప్రదేశం, రక్షణ) గురించి మీకు సహాయం చేయగలను. దయచేసి మీ ప్రశ్న అడగండి. హెల్ప్‌లైన్: 181",
+            "en": "I specialize in Indian women's rights (DOMESTIC VIOLENCE, POSH, PROPERTY). Please ask your specific question. Helpline: 181"
+        }
+        return {"response": fallbacks.get(body.lang, fallbacks["en"]), "metadata": {"aiPowered": False, "error": True}}
 @router.post("/game/match")
 def generate_match_game(body: AIQuizBody):
     """Generate 4 card pairs (Right + Description) for Rights Match game with hourly caching."""
