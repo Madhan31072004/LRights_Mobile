@@ -1,12 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInUp, FadeOut, ZoomIn, useSharedValue, useAnimatedStyle, withSpring, withTiming, withDelay, withRepeat, withSequence } from 'react-native-reanimated';
-import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, Star, Award, RotateCcw, Check, X, LayoutGrid } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, CheckCircle2, XCircle, Star, Award, RotateCcw, Check, X, LayoutGrid, Sparkles, RefreshCcw } from 'lucide-react-native';
 import API from '../api/axios';
 import { useUser } from '../contexts/UserContext';
 import { t } from '../utils/translation';
 
 const { width } = Dimensions.get('window');
+
+const ConfettiPiece = ({ index, opacity }) => {
+    const startX = Math.random() * width;
+    const endX = startX + (Math.random() - 0.5) * 200;
+    const duration = 2000 + Math.random() * 1000;
+    const delay = Math.random() * 1000;
+    const color = ['#7c3aed', '#ec4899', '#38bdf8', '#fbbf24', '#10b981'][index % 5];
+    
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: opacity.value,
+            transform: [
+                { translateY: withRepeat(withSequence(withTiming(-50, { duration: 0 }), withDelay(delay, withTiming(800, { duration }))), -1) },
+                { translateX: withRepeat(withSequence(withTiming(startX, { duration: 0 }), withDelay(delay, withTiming(endX, { duration }))), -1) },
+                { rotate: withRepeat(withTiming('360deg', { duration: duration / 2 }), -1) }
+            ]
+        };
+    });
+
+    return <Animated.View style={[styles.confetti, { backgroundColor: color }, animatedStyle]} />;
+};
 
 const QuizScreen = ({ route, navigation }) => {
   const { moduleId } = route.params;
@@ -15,23 +37,41 @@ const QuizScreen = ({ route, navigation }) => {
   const [currentQ, setCurrentQ] = React.useState(0);
   const [answers, setAnswers] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(null);
   const [submitting, setSubmitting] = React.useState(false);
   const [result, setResult] = React.useState(null);
   const [showReview, setShowReview] = React.useState(false);
 
   const confettiOpacity = useSharedValue(0);
 
-  React.useEffect(() => {
+  const fetchQuiz = React.useCallback(() => {
+    setLoading(true);
+    setLoadError(null);
+    setQuestions([]);
+    setCurrentQ(0);
+    setAnswers({});
+    setResult(null);
+    
     API.get(`/quizzes/module?moduleId=${moduleId}&lang=${language}`)
       .then(res => {
-        setQuestions(res.data[0]?.questions || []);
+        const q = res.data[0]?.questions || [];
+        if (q.length === 0) {
+          setLoadError('No quiz questions available for this module. Please try again.');
+        }
+        setQuestions(q);
         setLoading(false);
       })
       .catch(err => {
-        console.error(err);
+        console.error('Quiz load error:', err);
+        const msg = err?.response?.data?.detail || err?.message || 'Failed to load quiz';
+        setLoadError(msg);
         setLoading(false);
       });
   }, [moduleId, language]);
+
+  React.useEffect(() => {
+    fetchQuiz();
+  }, [fetchQuiz]);
 
   const handleAnswer = (idx) => {
     setAnswers({ ...answers, [currentQ]: idx });
@@ -71,8 +111,58 @@ const QuizScreen = ({ route, navigation }) => {
     }
   };
 
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} color="#7c3aed" />;
+  // Loading state
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <LinearGradient 
+          colors={['#0f0c29', '#1a1744']} 
+          style={styles.background} 
+          pointerEvents="none"
+        />
+        <View style={styles.loadingContainer}>
+          <Sparkles size={40} color="#7c3aed" />
+          <Text style={styles.loadingTitle}>{t('quiz.generating', { defaultValue: 'Generating Your Quiz...' })}</Text>
+          <Text style={styles.loadingSub}>{t('quiz.ai_generating', { defaultValue: 'AI is creating personalized questions based on this module' })}</Text>
+          <ActivityIndicator style={{ marginTop: 20 }} color="#7c3aed" size="large" />
+        </View>
+      </View>
+    );
+  }
 
+  // Error state
+  if (loadError || questions.length === 0) {
+    return (
+      <View style={styles.container}>
+        <LinearGradient 
+          colors={['#0f0c29', '#1a1744']} 
+          style={styles.background} 
+          pointerEvents="none"
+        />
+        <View style={styles.quizHeader}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <ChevronLeft size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>{t('modules.take_quiz', { defaultValue: 'Module Quiz' })}</Text>
+          <View style={{ width: 24 }} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <XCircle size={48} color="#ef4444" />
+          <Text style={styles.errorTitle}>{t('quiz.error', { defaultValue: 'Quiz Unavailable' })}</Text>
+          <Text style={styles.errorMsg}>{loadError || 'No questions available. Please try again.'}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={fetchQuiz}>
+            <RefreshCcw size={20} color="white" />
+            <Text style={styles.retryBtnText}>{t('quiz.retry', { defaultValue: 'Try Again' })}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Text style={styles.backButtonText}>{t('modules.back_to_modules', { defaultValue: 'Back to Modules' })}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  // Result state
   if (result) {
     return (
       <View style={styles.container}>
@@ -101,10 +191,20 @@ const QuizScreen = ({ route, navigation }) => {
                   </View>
               )}
 
+              <View style={styles.aiBadge}>
+                  <Sparkles size={14} color="#7c3aed" />
+                  <Text style={styles.aiBadgeText}>{t('quiz.ai_generated', { defaultValue: 'AI-Generated Quiz' })}</Text>
+              </View>
+
               <View style={styles.resultActions}>
                   <TouchableOpacity style={styles.reviewBtn} onPress={() => setShowReview(true)}>
                       <LayoutGrid size={20} color="white" />
                       <Text style={styles.reviewBtnText}>{t('quiz.review_answers', { defaultValue: 'Review Answers' })}</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity style={styles.retakeBtn} onPress={fetchQuiz}>
+                      <RefreshCcw size={20} color="#7c3aed" />
+                      <Text style={styles.retakeBtnText}>{t('quiz.retake', { defaultValue: 'Retake Quiz (New Questions)' })}</Text>
                   </TouchableOpacity>
                   
                   <TouchableOpacity style={styles.doneBtn} onPress={() => navigation.goBack()}>
@@ -153,27 +253,6 @@ const QuizScreen = ({ route, navigation }) => {
     );
   }
 
-  const ConfettiPiece = ({ index, opacity }) => {
-    const startX = Math.random() * width;
-    const endX = startX + (Math.random() - 0.5) * 200;
-    const duration = 2000 + Math.random() * 1000;
-    const delay = Math.random() * 1000;
-    const color = ['#7c3aed', '#ec4899', '#38bdf8', '#fbbf24', '#10b981'][index % 5];
-    
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            opacity: opacity.value,
-            transform: [
-                { translateY: withRepeat(withSequence(withTiming(-50, { duration: 0 }), withDelay(delay, withTiming(800, { duration }))), -1) },
-                { translateX: withRepeat(withSequence(withTiming(startX, { duration: 0 }), withDelay(delay, withTiming(endX, { duration }))), -1) },
-                { rotate: withRepeat(withTiming('360deg', { duration: duration / 2 }), -1) }
-            ]
-        };
-    });
-
-    return <Animated.View style={[styles.confetti, { backgroundColor: color }, animatedStyle]} />;
-  };
-
   const q = questions[currentQ];
   const progress = ((currentQ + 1) / questions.length) * 100;
 
@@ -189,7 +268,13 @@ const QuizScreen = ({ route, navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <ChevronLeft size={24} color="white" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('modules.take_quiz', { defaultValue: 'Module Quiz' })}</Text>
+          <View style={styles.headerCenter}>
+            <Text style={styles.headerTitle}>{t('modules.take_quiz', { defaultValue: 'Module Quiz' })}</Text>
+            <View style={styles.aiIndicator}>
+              <Sparkles size={12} color="#7c3aed" />
+              <Text style={styles.aiIndicatorText}>AI</Text>
+            </View>
+          </View>
           <Text style={styles.qCount}>{currentQ + 1} / {questions.length}</Text>
       </View>
 
@@ -270,8 +355,22 @@ const QuizScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 },
+  // Loading & Error
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
+  loadingTitle: { color: 'white', fontSize: 22, fontWeight: '800', marginTop: 20 },
+  loadingSub: { color: 'rgba(255,255,255,0.5)', fontSize: 14, textAlign: 'center', marginTop: 8 },
+  errorTitle: { color: 'white', fontSize: 22, fontWeight: '800', marginTop: 20 },
+  errorMsg: { color: 'rgba(255,255,255,0.5)', fontSize: 14, textAlign: 'center', marginTop: 8, lineHeight: 20 },
+  retryBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#7c3aed', paddingHorizontal: 25, paddingVertical: 14, borderRadius: 20, marginTop: 30 },
+  retryBtnText: { color: 'white', fontWeight: '700', fontSize: 16 },
+  backButton: { marginTop: 15, paddingVertical: 12, paddingHorizontal: 25, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  backButtonText: { color: 'rgba(255,255,255,0.7)', fontWeight: '700' },
+  // Quiz Header
   quizHeader: { height: 100, paddingTop: 60, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   headerTitle: { color: 'white', fontSize: 18, fontWeight: '700' },
+  aiIndicator: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(124, 58, 237, 0.2)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
+  aiIndicatorText: { color: '#7c3aed', fontSize: 10, fontWeight: '800' },
   qCount: { color: 'rgba(255,255,255,0.5)', fontSize: 14, fontWeight: '600' },
   progBarBg: { height: 4, backgroundColor: 'rgba(255,255,255,0.05)' },
   progBarFill: { height: '100%', backgroundColor: '#7c3aed' },
@@ -297,9 +396,13 @@ const styles = StyleSheet.create({
   resultSub: { color: 'rgba(255,255,255,0.5)', fontSize: 16, marginTop: 5 },
   pointsBadge: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fbbf24', paddingHorizontal: 15, paddingVertical: 8, borderRadius: 20, marginTop: 20 },
   pointsText: { color: 'white', fontWeight: '700' },
+  aiBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(124, 58, 237, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 15, marginTop: 12, borderWidth: 1, borderColor: 'rgba(124, 58, 237, 0.3)' },
+  aiBadgeText: { color: '#a78bfa', fontSize: 12, fontWeight: '700' },
   resultActions: { width: '100%', gap: 15, marginTop: 40 },
   reviewBtn: { height: 60, width: '100%', backgroundColor: 'rgba(124, 58, 237, 0.2)', borderRadius: 20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: '#7c3aed40' },
   reviewBtnText: { color: 'white', fontSize: 16, fontWeight: '700' },
+  retakeBtn: { height: 60, width: '100%', backgroundColor: 'rgba(124, 58, 237, 0.08)', borderRadius: 20, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10, borderWidth: 1, borderColor: 'rgba(124, 58, 237, 0.2)' },
+  retakeBtnText: { color: '#a78bfa', fontSize: 16, fontWeight: '700' },
   doneBtn: { height: 60, width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 20, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
   doneBtnText: { color: 'rgba(255,255,255,0.7)', fontSize: 16, fontWeight: '700' },
   dotsContainer: { backgroundColor: 'rgba(255,255,255,0.02)', paddingVertical: 15, borderBottomWidth: 1, borderColor: 'rgba(255,255,255,0.05)' },
